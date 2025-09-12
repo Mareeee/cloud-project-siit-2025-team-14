@@ -11,8 +11,13 @@ export class AppComponent {
   constructor(private http: HttpClient, private songsService: SongsService) { }
   title = 'gateway-demo';
   response = 'The response will show up here';
-  newSong: Song = { title: 'New Song' };
-  selectedFile?: File;
+  newSong: Song = {
+    title: 'New Song',
+    authorId: "2342342",
+    genres: ['pop', 'rock']
+  };
+  selectedCover!: File;
+  selectedAudio!: File;
 
   showSongs() {
     this.songsService.getSongs().subscribe((res: any) => {
@@ -20,12 +25,16 @@ export class AppComponent {
     });
   }
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+  onCoverSelected(event: any) {
+    this.selectedCover = event.target.files[0];
+  }
+
+  onAudioSelected(event: any) {
+    this.selectedAudio = event.target.files[0];
   }
 
   addSong() {
-    this.songsService.addSong(this.newSong, this.selectedFile).subscribe({
+    this.songsService.addSong(this.newSong, this.selectedCover, this.selectedAudio).subscribe({
       next: (res) => this.response = 'Success: ' + JSON.stringify(res),
       error: (err) => this.response = 'Error: ' + JSON.stringify(err)
     });
