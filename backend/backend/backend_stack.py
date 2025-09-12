@@ -40,7 +40,10 @@ class BackendStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset('lambda'),
             handler='songs.get_songs.handler',
-            environment={"SONGS_TABLE": songs_table.table_name}
+            environment={
+                "SONGS_TABLE": songs_table.table_name,
+                "MEDIA_BUCKET": media_bucket.bucket_name
+            }
         )
 
         create_song_lambda = _lambda.Function(

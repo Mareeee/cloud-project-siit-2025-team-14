@@ -11,7 +11,7 @@ export class AppComponent {
   constructor(private http: HttpClient, private songsService: SongsService) { }
   title = 'gateway-demo';
   response = 'The response will show up here';
-  newSong: Song = { title: 'New Song' };
+  newSong: Song = { title: 'New Song', id: "-1", artistId: "-1", albumId: "-1", creationDate: "12.9.2025", genres: new Set<string>("asdf") };
   selectedFile?: File;
 
   showSongs() {
