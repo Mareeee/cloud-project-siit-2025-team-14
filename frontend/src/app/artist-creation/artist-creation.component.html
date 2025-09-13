@@ -1,0 +1,26 @@
+<div class="artist-container">
+    <div class="artist-card">
+        <h1 class="artist-title">Create Artist</h1>
+
+        <input type="text" placeholder="Artist Name" [(ngModel)]="newArtist.name" class="full-width" />
+        <textarea placeholder="Biography" rows="4" [(ngModel)]="newArtist.biography" class="full-width"></textarea>
+
+        <div class="dropdown-container">
+            <button type="button" class="dropdown-btn" (click)="toggleDropdown()">
+                {{ newArtist.genres.length ? newArtist.genres.join(', ') : 'Select Genres' }}
+                <span class="arrow" [class.open]="dropdownOpen">&#9662;</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="dropdownOpen">
+                <label *ngFor="let genre of availableGenres" class="dropdown-item">
+                    <input type="checkbox" [value]="genre" (change)="toggleGenre(genre)"
+                        [checked]="newArtist.genres.includes(genre)" />
+                    {{ genre }}
+                </label>
+            </div>
+        </div>
+
+        <button (click)="createArtist()" class="create-btn">Create Artist</button>
+    </div>
+
+    <div class="snackbar" [class.show]="showSnackbar">{{ snackbarMessage }}</div>
+</div>

@@ -21,23 +21,23 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Author</mat-label>
+      <mat-label>Artist</mat-label>
       <mat-select
         multiple
         required
-        [(ngModel)]="newSong.authors"
-        name="authors"
+        [(ngModel)]="newSong.artistIds"
+        name="artist"
       >
-        <mat-option *ngFor="let author of authors" [value]="author">
-          {{ author }}
+        <mat-option *ngFor="let artist of artists" [value]="artist">
+          {{ artist }}
         </mat-option>
       </mat-select>
-      <mat-error>Please select song author.</mat-error>
+      <mat-error>Please select song artist.</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Album</mat-label>
-      <mat-select [(ngModel)]="newSong.album" name="album">
+      <mat-select [(ngModel)]="newSong.albumId" name="album">
         <mat-option *ngFor="let album of albums" [value]="album">
           {{ album }}
         </mat-option>

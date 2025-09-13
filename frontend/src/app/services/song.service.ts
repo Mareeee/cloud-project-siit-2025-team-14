@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
-import { Song } from './music.model';
+import { Song } from '../models/song.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SongsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private apiUrl = 'https://35500nafx8.execute-api.eu-central-1.amazonaws.com';
   private stagePath = '/dev';
@@ -15,8 +15,8 @@ export class SongsService {
 
   private url = this.apiUrl + this.stagePath + this.resourcePath;
 
-  getSongs(): Observable<Song[]> {
-    return this.http.get<Song[]>(this.url);
+  getSongs(): Observable<{ data: Song[] }> {
+    return this.http.get<{ data: Song[] }>(this.url);
   }
 
   addSong(song: Song, cover: File, audio: File): Observable<any> {
@@ -24,7 +24,7 @@ export class SongsService {
       this.http
         .put<any>(this.url, {
           title: song.title,
-          authorId: song.authorId,
+          artistIds: song.artistIds,
           genres: song.genres,
           coverFilename: cover.name,
           audioFilename: audio.name,

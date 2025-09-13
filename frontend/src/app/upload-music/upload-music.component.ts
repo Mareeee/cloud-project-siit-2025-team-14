@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { SongsService } from '../song.service';
-import { Song } from '../music.model';
+import { SongsService } from '../services/song.service';
+import { Song } from '../models/song.model';
 
 @Component({
   selector: 'app-upload-music',
@@ -13,15 +13,16 @@ export class UploadMusicComponent {
   response = 'The response will show up here';
 
   genres: string[] = ['Pop', 'Rock', 'Hip-Hop'];
-  authors: string[] = ['Aca Lukas', 'Darko Lazić', 'Viki Miljković'];
+  artists: string[] = ['Aca Lukas', 'Darko Lazić', 'Viki Miljković'];
   albums: string[] = ['Godinu Dana 300 kafana', 'Istina je da te lažem', 'Loša sreća'];
 
   newSong: Song = {
+    id: '',
     title: '',
-    authorId: "",
-    genres: [],
-    authors: [],
-    album: []
+    artistIds: [],
+    albumId: '',
+    creationDate: '',
+    genres: []
   };
 
   selectedCover!: File;

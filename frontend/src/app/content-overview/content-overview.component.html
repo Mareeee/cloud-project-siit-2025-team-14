@@ -1,0 +1,28 @@
+<div *ngIf="songs.length > 0" class="songs-container">
+    <h2>All Songs</h2>
+    <div class="songs-grid">
+        <div *ngFor="let song of songs" class="song-card">
+            <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
+
+            <div class="song-info">
+                <h3 class="song-title">{{ song.title }}</h3>
+                <p class="song-artist">{{ song.artistName }}</p>
+                <p *ngIf="song.artistBio" class="artist-bio"><i>{{ song.artistBio }}</i></p>
+                <p *ngIf="song.artistGenres?.length" class="artist-genres">Genres: {{ song.artistGenres.join(', ') }}
+                </p>
+                <p class="song-date">Released: {{ song.creationDate | date:'mediumDate' }}</p>
+
+                <div class="audio-player-wrapper">
+                    <button (click)="togglePlay(song)" class="play-btn">
+                        {{ song.isPlaying ? '❚❚' : '▶' }}
+                    </button>
+                    <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
+                        (input)="seek(song)" class="audio-slider" />
+                    <span class="time">{{ formatTime(song.currentTime) }} / {{ formatTime(song.duration) }}</span>
+                    <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata($event, song)"
+                        (timeupdate)="onTimeUpdate($event, song)"></audio>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
