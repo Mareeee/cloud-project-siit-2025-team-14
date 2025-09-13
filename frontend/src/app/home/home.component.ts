@@ -20,6 +20,6 @@ export class HomeComponent {
   }
 
   goToSongCreation() {
-    this.router.navigate(['/song-create']);
+    this.router.navigate(['/music-upload']);
   }
 }

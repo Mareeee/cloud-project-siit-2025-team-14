@@ -1,6 +1,5 @@
-* {
-    font-family: 'SpotifyFont';
-}
+html, body { height: 100%; }
+body { margin: 0; background-color: #121212; }
 
 @font-face {
   font-family: 'SpotifyFont';
@@ -9,11 +8,78 @@
   font-style: normal;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
+* {
+    font-family: 'SpotifyFont';
 }
 
-body {
-  font-family: 'SpotifyFont', sans-serif;
+.mat-mdc-text-field-wrapper.mdc-text-field {
+  background-color: #212121 !important;
+}
+
+.mat-mdc-form-field-focus-overlay {
+  background-color: transparent !important;
+}
+
+.mat-mdc-select-trigger {
+  color: #f5f5f5 !important;
+}
+
+.mat-mdc-select-panel {
+  background-color: #212121 !important;
+  color: #f5f5f5 !important;
+}
+
+.mat-mdc-option {
+  color: #f5f5f5 !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected {
+  background-color: #333333 !important;
+  color: #ebebeb !important;
+}
+
+.mat-mdc-floating-label {
+  color: #ebebeb !important;
+}
+
+.mdc-text-field--focused .mat-mdc-floating-label {
+  color: #ebebeb !important;
+}
+
+.mdc-line-ripple::before {
+  border-bottom-color: #ebebeb !important;
+}
+
+.mdc-line-ripple::after {
+  border-bottom-color: #ebebeb !important;
+}
+
+input.mat-mdc-input-element {
+  color: #ebebeb !important;
+}
+
+.mat-mdc-option:hover {
+  background-color: #333333 !important;
+  color: #ebebeb !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected,
+.mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  background-color: #333333 !important;
+  color: #ebebeb !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:hover,
+.mat-mdc-option.mdc-list-item--selected:hover .mdc-list-item__primary-text {
+  background-color: #444 !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-select-value-text {
+  color: #ebebeb !important;
+}
+
+.mat-error {
+  color: #ff6b6b;
+  font-size: 0.9rem;
 }

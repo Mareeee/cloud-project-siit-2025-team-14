@@ -8,7 +8,7 @@ export interface Song {
     imageUrl?: string;
     artistName?: string;
     artistBio?: string;
-    audioUrl: string;
+    audioUrl?: string;
     artistNames?: string[];
     artistBios?: string[];
     artistGenres?: string[];
