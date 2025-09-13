@@ -1,0 +1,111 @@
+<div class="center-container">
+  <form class="upload-music-form">
+    <div class="form-title">
+      <h2>Upload Music</h2>
+    </div>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Song Title</mat-label>
+      <input matInput required [(ngModel)]="newSong.title" name="title" />
+      <mat-error>Please enter song title.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Genres</mat-label>
+      <mat-select multiple required [(ngModel)]="newSong.genres" name="genres">
+        <mat-option *ngFor="let genre of genres" [value]="genre">
+          {{ genre }}
+        </mat-option>
+      </mat-select>
+      <mat-error>Please select song genres.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Author</mat-label>
+      <mat-select
+        multiple
+        required
+        [(ngModel)]="newSong.authors"
+        name="authors"
+      >
+        <mat-option *ngFor="let author of authors" [value]="author">
+          {{ author }}
+        </mat-option>
+      </mat-select>
+      <mat-error>Please select song author.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Album</mat-label>
+      <mat-select [(ngModel)]="newSong.album" name="album">
+        <mat-option *ngFor="let album of albums" [value]="album">
+          {{ album }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="cover-upload-container">
+      <label class="cover-label">Cover Image</label>
+
+      <div class="cover-preview-wrapper">
+        <div class="cover-preview" (click)="coverInput.click()">
+          <ng-container *ngIf="coverPreview; else addCover">
+            <img [src]="coverPreview" alt="Cover Preview" />
+          </ng-container>
+
+          <ng-template #addCover>
+            <div class="add-cover-btn">
+              <mat-icon>add_circle</mat-icon>
+            </div>
+          </ng-template>
+        </div>
+
+        <button
+          *ngIf="coverPreview"
+          type="button"
+          class="remove-cover"
+          (click)="removeCover(); $event.stopPropagation()"
+        >
+          <mat-icon>remove_circle</mat-icon>
+        </button>
+
+        <input
+          #coverInput
+          type="file"
+          (change)="onCoverSelected($event)"
+          hidden
+        />
+      </div>
+    </div>
+
+    <div class="audio-upload-container">
+      <label class="audio-label">Audio File</label>
+
+      <div class="audio-preview-wrapper">
+        <ng-container *ngIf="audioPreview; else addAudio">
+          <audio controls [src]="audioPreview"></audio>
+          <button type="button" class="remove-audio" (click)="removeAudio()">
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+        </ng-container>
+
+        <ng-template #addAudio>
+          <label class="custom-file-upload">
+            <input
+              type="file"
+              accept="audio/*"
+              (change)="onAudioSelected($event)"
+              hidden
+            />
+            <mat-icon>add_circle</mat-icon>
+          </label>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="form-buttons">
+      <button mat-raised-button class="cancel" type="button">Cancel</button>
+      <button mat-raised-button class="submit" type="submit">Upload</button>
+    </div>
+  </form>
+</div>

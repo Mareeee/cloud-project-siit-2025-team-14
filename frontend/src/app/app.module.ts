@@ -5,15 +5,19 @@ import { AppComponent } from './app.component';
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { FormsModule } from '@angular/forms';
+import { MaterialModule } from './material/material.module';
+import { UploadMusicComponent } from './upload-music/upload-music.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    UploadMusicComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    MaterialModule
   ],
   providers: [
     provideClientHydration(),
