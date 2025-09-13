@@ -35,6 +35,7 @@ body { margin: 0; background-color: #121212; }
 
 .mat-mdc-option.mdc-list-item--selected {
   background-color: #333333 !important;
+  color: #ebebeb !important;
 }
 
 .mat-mdc-floating-label {
@@ -54,6 +55,27 @@ body { margin: 0; background-color: #121212; }
 }
 
 input.mat-mdc-input-element {
+  color: #ebebeb !important;
+}
+
+.mat-mdc-option:hover {
+  background-color: #333333 !important;
+  color: #ebebeb !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected,
+.mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  background-color: #333333 !important;
+  color: #ebebeb !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:hover,
+.mat-mdc-option.mdc-list-item--selected:hover .mdc-list-item__primary-text {
+  background-color: #444 !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-select-value-text {
   color: #ebebeb !important;
 }
 

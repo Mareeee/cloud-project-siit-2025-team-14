@@ -45,7 +45,7 @@ mat-form-field {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   cursor: pointer;
   padding: 1rem;
   background-color: #1f27cf;
