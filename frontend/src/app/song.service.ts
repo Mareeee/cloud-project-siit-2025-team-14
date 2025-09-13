@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
-import { Song } from './music.model';
+import { Song } from './song.model';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,7 @@ export class SongsService {
       this.http
         .put<any>(this.url, {
           title: song.title,
-          artistId: song.artistId,
+          artistIds: song.artistIds,
           genres: song.genres,
           coverFilename: cover.name,
           audioFilename: audio.name,

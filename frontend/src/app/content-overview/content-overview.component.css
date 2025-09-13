@@ -1,5 +1,6 @@
 .songs-container {
-  padding: 2rem;
+  padding: 2vh;
+  min-height: 90vh;
   background-color: #121212;
   color: #fff;
   font-family: 'Arial', sans-serif;
@@ -9,7 +10,7 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: #1db954;
+  color: #1f27cf;
 }
 
 .songs-grid {
@@ -29,6 +30,7 @@
 .song-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  cursor: pointer;
 }
 
 .song-image {
@@ -66,4 +68,38 @@
   width: 100%;
   margin-top: 0.5rem;
   outline: none;
+}
+
+.audio-player-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.play-btn {
+  background: #1f27cf;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+}
+
+.audio-slider {
+  flex: 1;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: #ccc;
+  width: 60px;
+  text-align: right;
 }

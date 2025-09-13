@@ -12,7 +12,16 @@
                 </p>
                 <p class="song-date">Released: {{ song.creationDate | date:'mediumDate' }}</p>
 
-                <audio *ngIf="song.audioUrl" controls [src]="song.audioUrl" class="audio-player"></audio>
+                <div class="audio-player-wrapper">
+                    <button (click)="togglePlay(song)" class="play-btn">
+                        {{ song.isPlaying ? '❚❚' : '▶' }}
+                    </button>
+                    <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
+                        (input)="seek(song)" class="audio-slider" />
+                    <span class="time">{{ formatTime(song.currentTime) }} / {{ formatTime(song.duration) }}</span>
+                    <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata($event, song)"
+                        (timeupdate)="onTimeUpdate($event, song)"></audio>
+                </div>
             </div>
         </div>
     </div>

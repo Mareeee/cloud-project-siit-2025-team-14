@@ -1,7 +1,7 @@
 export interface Song {
     id: string;
     title: string;
-    artistId: string;
+    artistIds: string[];
     albumId: string;
     creationDate: string;
     genres: string[];

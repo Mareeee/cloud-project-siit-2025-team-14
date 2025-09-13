@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { SongsService } from '../song.service';
 import { ArtistsService } from '../artist.service';
 import { forkJoin } from 'rxjs';
+import { Song } from '../song.model';
+import { Artist } from '../artist.model';
 
 @Component({
   selector: 'app-content-overview',
@@ -10,7 +12,7 @@ import { forkJoin } from 'rxjs';
 })
 export class ContentOverviewComponent {
   songs: any[] = [];
-  artists: any[] = [];
+  artists: Artist[] = [];
 
   constructor(
     private songsService: SongsService,
@@ -28,10 +30,44 @@ export class ContentOverviewComponent {
           ...song,
           artistName: artist ? artist.name : 'Unknown Artist',
           artistBio: artist ? artist.biography : '',
-          artistGenres: artist ? artist.genres : []
+          artistGenres: artist ? artist.genres : [],
+          isPlaying: false,
+          currentTime: 0,
+          duration: 0
         };
       });
     });
+  }
 
+  togglePlay(song: any) {
+    const audio: HTMLAudioElement = document.querySelector(`audio[src="${song.audioUrl}"]`)!;
+    if (!audio) return;
+
+    if (song.isPlaying) {
+      audio.pause();
+      song.isPlaying = false;
+    } else {
+      audio.play();
+      song.isPlaying = true;
+    }
+  }
+
+  seek(song: any) {
+    const audio: HTMLAudioElement = document.querySelector(`audio[src="${song.audioUrl}"]`)!;
+    audio.currentTime = song.currentTime;
+  }
+
+  onLoadedMetadata(event: any, song: any) {
+    song.duration = event.target.duration;
+  }
+
+  onTimeUpdate(event: any, song: any) {
+    song.currentTime = event.target.currentTime;
+  }
+
+  formatTime(time: number) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
   }
 }
