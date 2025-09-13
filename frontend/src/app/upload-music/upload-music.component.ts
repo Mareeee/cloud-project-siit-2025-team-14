@@ -6,6 +6,7 @@ import { Song } from '../models/song.model';
 import { AVAILABLE_GENRES } from '../utils/genres';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Artist } from '../models/artist.model';
 
 @Component({
   selector: 'app-upload-music',
@@ -52,7 +53,7 @@ export class UploadMusicComponent implements OnInit {
   loadArtists() {
     this.artistsService.getArtists().subscribe({
       next: (res) => {
-        this.artists = res.data.map((a: any) => ({ id: a.id, name: a.name }));
+        this.artists = res.data.map((a: Artist) => ({ id: a.id, name: a.name }));
       },
       error: () => {
         this.snackBar.open('Failed to load artists', 'Close', {
