@@ -15,13 +15,13 @@ def handler(event, context):
         body = json.loads(event["body"])
 
         title = body.get("title")
-        author_id = body.get("authorId")
+        artist_ids = body.get("artistId")
         genres = body.get("genres")
         album_id = body.get("albumId")
         cover_filename = body.get("coverFilename")
         audio_filename = body.get("audioFilename")
 
-        if not title or not cover_filename or not audio_filename or not author_id or not genres:
+        if not title or not cover_filename or not audio_filename or not artist_ids or not genres:
             return create_response(400, {"message": "all fields required"})
         
         song_id = str(uuid.uuid4())
@@ -43,7 +43,7 @@ def handler(event, context):
         item = {
             "id": song_id,
             "title": title,
-            "authorId": author_id,
+            "artistIds": set(artist_ids),
             "genres": set(genres),
             "s3KeyCover": s3_cover_key,
             "s3KeyAudio": s3_audio_key,

@@ -1,12 +1,5 @@
-/* Global styles for your project, minimal overrides to not conflict with Angular Material */
-
-html, body {
-  height: 100%;
-  margin: 0;
-}
-
-body {
-  font-family: 'SpotifyFont', sans-serif;
+* {
+    font-family: 'SpotifyFont';
 }
 
 @font-face {
@@ -16,6 +9,11 @@ body {
   font-style: normal;
 }
 
-* {
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
   font-family: 'SpotifyFont', sans-serif;
 }

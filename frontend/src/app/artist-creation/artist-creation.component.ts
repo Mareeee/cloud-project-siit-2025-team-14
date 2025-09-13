@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ArtistsService } from '../artist.service';
-import { Artist } from '../artist.model';
+import { ArtistsService } from '../services/artist.service';
+import { Artist } from '../models/artist.model';
 import { AVAILABLE_GENRES } from '../utils/genres';
 
 @Component({

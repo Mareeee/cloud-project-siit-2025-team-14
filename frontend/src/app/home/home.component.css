@@ -1,0 +1,33 @@
+* {
+    background-color: #1f27cf;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    height: 100vh;
+}
+
+a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-size: large;
+    background-color: #1DB954;
+    height: 100px;
+    width: 250px;
+    border-radius: 20px;
+    transition: 0.5s ease;
+}
+
+a:hover {
+    cursor: pointer;
+    color: black;
+    height: 100px;
+    width: 250px;
+    transform: scale(1.1);
+}

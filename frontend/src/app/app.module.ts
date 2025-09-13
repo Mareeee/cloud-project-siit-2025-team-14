@@ -6,10 +6,15 @@ import { AppComponent } from './app.component';
 import { ArtistCreationComponent } from './artist-creation/artist-creation.component';
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { HomeComponent } from './home/home.component';
+import { ContentOverviewComponent } from './content-overview/content-overview.component';
+
 @NgModule({
   declarations: [
     AppComponent,
-    ArtistCreationComponent
+    ContentOverviewComponent,
+    ArtistCreationComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
