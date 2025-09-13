@@ -4,5 +4,5 @@ export interface Song {
     artistId: string;
     albumId: string;
     creationDate: string;
-    genres: Set<string>
+    genres: string[];
 }

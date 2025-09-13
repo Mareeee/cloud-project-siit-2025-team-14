@@ -1,17 +1,1 @@
-<div class="container">
-  <div>
-    <h1>Songs API</h1>
-    <p>See all beloved songs</p>
-    <h2>Get all Songs</h2>
-    <input type="button" (click)="showSongs()" value="Show Songs" />
-
-    <h2>Add Song</h2>
-    <input type="text" [(ngModel)]="newSong.title" placeholder="Song title" />
-    <input type="file" (change)="onFileSelected($event)" />
-    <input type="button" (click)="addSong()" value="Add Song" />
-  </div>
-  <div>
-    <h1>Response</h1>
-    <pre>{{response}}</pre>
-  </div>
-</div>
+<router-outlet></router-outlet>

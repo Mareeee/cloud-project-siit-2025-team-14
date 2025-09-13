@@ -1,0 +1,19 @@
+<div *ngIf="songs.length > 0" class="songs-container">
+    <h2>All Songs</h2>
+    <div class="songs-grid">
+        <div *ngFor="let song of songs" class="song-card">
+            <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
+
+            <div class="song-info">
+                <h3 class="song-title">{{ song.title }}</h3>
+                <p class="song-artist">{{ song.artistName }}</p>
+                <p *ngIf="song.artistBio" class="artist-bio"><i>{{ song.artistBio }}</i></p>
+                <p *ngIf="song.artistGenres?.length" class="artist-genres">Genres: {{ song.artistGenres.join(', ') }}
+                </p>
+                <p class="song-date">Released: {{ song.creationDate | date:'mediumDate' }}</p>
+
+                <audio *ngIf="song.audioUrl" controls [src]="song.audioUrl" class="audio-player"></audio>
+            </div>
+        </div>
+    </div>
+</div>

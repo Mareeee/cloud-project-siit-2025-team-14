@@ -1,50 +1,39 @@
 import os
 import boto3
 from songs.utils.utils import create_response
-from datetime import datetime
 
-table_name = os.environ['SONGS_TABLE']
-bucket_name = os.environ['MEDIA_BUCKET']
-
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(table_name)
-s3 = boto3.client('s3')
-
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(os.environ["SONGS_TABLE"])
+s3 = boto3.client("s3")
+bucket_name = os.environ["MEDIA_BUCKET"]
 
 def handler(event, context):
     try:
         response = table.scan()
-        items = response.get('Items', [])
+        songs = response.get("Items", [])
 
-        songs_data = []
+        for song in songs:
+            genres = song.get("genres", [])
+            if isinstance(genres, set):
+                song["genres"] = list(genres)
+            elif not isinstance(genres, list):
+                song["genres"] = [str(genres)]
 
-        for item in items:
-            song = {
-                "id": item.get("id"),
-                "title": item.get("title"),
-                "artistId": item.get("artistId", None),
-                "albumId": item.get("albumId", None),
-                "creationDate": item.get("creationDate", None),
-                "genres": list(item.get("genres", []))
-            }
+            audio_key = song.get("s3KeyAudio")
+            if audio_key:
+                song["audioUrl"] = s3.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": bucket_name, "Key": audio_key}
+                )
 
-            media = item.get("media", {})
-            for media_type in ["audio", "image"]:
-                s3_key = media.get(media_type)
-                if s3_key:
-                    try:
-                        s3_head = s3.head_object(Bucket=bucket_name, Key=s3_key)
-                        song[f"{media_type}FileName"] = s3_key.split('/')[-1]
-                        song[f"{media_type}FileSize"] = s3_head.get("ContentLength")
-                        song[f"{media_type}FileType"] = s3_head.get("ContentType")
-                        song[f"{media_type}LastModified"] = s3_head.get("LastModified").isoformat()
-                        song[f"{media_type}Url"] = f"https://{bucket_name}.s3.amazonaws.com/{s3_key}"
-                    except Exception:
-                        pass
+            cover_key = song.get("s3KeyCover")
+            if cover_key:
+                song["imageUrl"] = s3.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": bucket_name, "Key": cover_key}
+                )
 
-            songs_data.append(song)
-
-        return create_response(200, {"data": songs_data})
+        return create_response(200, {"data": songs})
 
     except Exception as e:
         return create_response(500, {"message": str(e)})

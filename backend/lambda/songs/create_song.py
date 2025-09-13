@@ -2,6 +2,7 @@ import os
 import boto3
 import uuid
 import json
+from datetime import datetime
 from songs.utils.utils import create_response
 
 s3 = boto3.client("s3")
@@ -12,31 +13,53 @@ table = dynamodb.Table(os.environ["SONGS_TABLE"])
 def handler(event, context):
     try:
         body = json.loads(event["body"])
-        title = body.get("title")
-        filename = body.get("filename")
 
-        if not title or not filename:
-            return create_response(400, {"message": "title and filename required"})
+        title = body.get("title")
+        artist_id = body.get("artistId")
+        genres = body.get("genres")
+        album_id = body.get("albumId")
+        cover_filename = body.get("coverFilename")
+        audio_filename = body.get("audioFilename")
+
+        if not title or not cover_filename or not audio_filename or not artist_id or not genres:
+            return create_response(400, {"message": "all fields required"})
         
         song_id = str(uuid.uuid4())
-        s3_key = f"{song_id}/{filename}"
+        s3_cover_key = f"{song_id}/cover/{cover_filename}"
+        s3_audio_key = f"{song_id}/audio/{audio_filename}"
 
-        presigned_url = s3.generate_presigned_url(
+        cover_presigned_url = s3.generate_presigned_url(
             "put_object",
-            Params={"Bucket": bucket, "Key": s3_key},
+            Params={"Bucket": bucket, "Key": s3_cover_key},
             ExpiresIn=300
         )
 
-        table.put_item(Item={
+        audio_presigned_url = s3.generate_presigned_url(
+            "put_object",
+            Params={"Bucket": bucket, "Key": s3_audio_key},
+            ExpiresIn=300
+        )
+
+        item = {
             "id": song_id,
             "title": title,
-            "s3Key": s3_key
-        })
+            "artistId": artist_id,
+            "genres": set(genres),
+            "s3KeyCover": s3_cover_key,
+            "s3KeyAudio": s3_audio_key,
+            "creationDate": datetime.utcnow().isoformat()
+        }
+        
+        if album_id:
+            item["album_id"] = album_id
+
+        table.put_item(Item=item)
 
         return create_response(200, {
             "message": f'Song "{title}" ready for upload',
             "id": song_id,
-            "uploadUrl": presigned_url
+            "coverUploadUrl": cover_presigned_url,
+            "audioUploadUrl": audio_presigned_url
         })
     except Exception as e:
         return create_response(500, {"message": str(e)})
