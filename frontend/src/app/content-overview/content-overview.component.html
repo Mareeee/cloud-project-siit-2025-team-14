@@ -6,21 +6,30 @@
 
             <div class="song-info">
                 <h3 class="song-title">{{ song.title }}</h3>
-                <p class="song-artist">{{ song.artistName }}</p>
-                <p *ngIf="song.artistBio" class="artist-bio"><i>{{ song.artistBio }}</i></p>
-                <p *ngIf="song.artistGenres?.length" class="artist-genres">Genres: {{ song.artistGenres.join(', ') }}
+                <p class="song-artist">{{ song.artistNames?.join(', ') }}</p>
+                <p *ngIf="song.artistBios?.length" class="artist-bio">
+                    Biography: <i>{{ song.artistBios!.join(' | ') }}</i>
+                </p>
+                <p *ngIf="song.genres?.length" class="song-genres">
+                    Genres: {{ song.genres!.join(', ') }}
                 </p>
                 <p class="song-date">Released: {{ song.creationDate | date:'mediumDate' }}</p>
-
+                <div class="song-spacer"></div>
                 <div class="audio-player-wrapper">
-                    <button (click)="togglePlay(song)" class="play-btn">
+                    <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata(song, $event)"
+                        (timeupdate)="onTimeUpdate(song, $event)">
+                    </audio>
+
+                    <button (click)="togglePlay(song, audioElem)" class="play-btn">
                         {{ song.isPlaying ? '❚❚' : '▶' }}
                     </button>
+
                     <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
-                        (input)="seek(song)" class="audio-slider" />
-                    <span class="time">{{ formatTime(song.currentTime) }} / {{ formatTime(song.duration) }}</span>
-                    <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata($event, song)"
-                        (timeupdate)="onTimeUpdate($event, song)"></audio>
+                        (input)="seek(song, audioElem)" class="audio-slider" />
+
+                    <span class="time">
+                        {{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}
+                    </span>
                 </div>
             </div>
         </div>
