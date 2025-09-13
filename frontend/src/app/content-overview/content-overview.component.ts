@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
-import { SongsService } from '../song.service';
-import { ArtistsService } from '../artist.service';
+import { SongsService } from '../services/song.service';
+import { ArtistsService } from '../services/artist.service';
 import { forkJoin } from 'rxjs';
-import { Song } from '../song.model';
-import { Artist } from '../artist.model';
 
 @Component({
   selector: 'app-content-overview',
@@ -12,7 +10,7 @@ import { Artist } from '../artist.model';
 })
 export class ContentOverviewComponent {
   songs: any[] = [];
-  artists: Artist[] = [];
+  artists: any[] = [];
 
   constructor(
     private songsService: SongsService,

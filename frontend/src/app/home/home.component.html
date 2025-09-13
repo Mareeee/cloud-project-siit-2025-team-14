@@ -1,28 +1,5 @@
 <div class="container">
-    <div>
-        <h1>Songs API</h1>
-        <p>See all beloved songs</p>
-
-        <h2>Get all Songs</h2>
-        <input type="button" (click)="showSongs()" value="Show Songs" />
-
-        <h2>Add Song</h2>
-        <input type="text" [(ngModel)]="newSong.title" placeholder="Song title" />
-        <input type="file" (change)="onCoverSelected($event)" />
-        <input type="file" (change)="onAudioSelected($event)" />
-        <input type="button" (click)="addSong()" value="Add Song" />
-
-        <hr />
-
-        <h2>Create Artist</h2>
-        <input type="text" [(ngModel)]="newArtist.name" placeholder="Artist name" />
-        <textarea [(ngModel)]="newArtist.biography" placeholder="Biography"></textarea>
-        <input type="text" [(ngModel)]="newArtist.genres" placeholder="Genres (comma-separated)" />
-        <input type="button" (click)="createArtist()" value="Create Artist" />
-    </div>
-
-    <div>
-        <h1>Response</h1>
-        <pre>{{ response }}</pre>
-    </div>
+    <a (click)="goToContentOverview()">Content Overview</a>
+    <a (click)="goToArtistCreation()">Artist Creation</a>
+    <a (click)="goToSongCreation()">Song Creation</a>
 </div>
