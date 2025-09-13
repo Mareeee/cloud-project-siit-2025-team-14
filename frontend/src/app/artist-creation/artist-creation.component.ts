@@ -9,7 +9,7 @@ import { AVAILABLE_GENRES } from '../utils/genres';
   styleUrls: ['./artist-creation.component.css']
 })
 export class ArtistCreationComponent {
-  newArtist: Artist = { name: '', biography: '', genres: [] };
+  newArtist: Artist = { id: '', name: '', biography: '', genres: [] };
   availableGenres = AVAILABLE_GENRES;
   dropdownOpen = false;
 
@@ -35,7 +35,7 @@ export class ArtistCreationComponent {
     this.artistsService.createArtist(this.newArtist).subscribe({
       next: () => {
         this.triggerSnackbar('Artist created successfully!', true);
-        this.newArtist = { name: '', biography: '', genres: [] };
+        this.newArtist = { id: '', name: '', biography: '', genres: [] };
       },
       error: (err) => {
         this.triggerSnackbar('Error creating artist: ' + err.message, false);
