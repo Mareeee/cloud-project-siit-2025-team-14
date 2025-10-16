@@ -1,0 +1,58 @@
+<div class="discover-container">
+    <h2>Discover Music</h2>
+
+    <div class="filter-section">
+        <label for="genreSelect">Select Genre:</label>
+        <select id="genreSelect" [(ngModel)]="selectedGenre" (change)="onGenreChange()">
+            <option *ngFor="let genre of availableGenres" [value]="genre">{{ genre }}</option>
+        </select>
+    </div>
+
+    <div *ngIf="artists.length > 0" class="section">
+        <h3>Artists</h3>
+        <div class="grid">
+            <div *ngFor="let artist of artists" class="card" (click)="showArtistSongs(artist.id)">
+                <h4>{{ artist.name }}</h4>
+                <p *ngIf="artist.biography">{{ artist.biography }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="albums.length > 0" class="section">
+        <h3>Albums</h3>
+        <div class="grid">
+            <div *ngFor="let album of albums" class="card" (click)="showAlbumSongs(album.id)">
+                <h4>{{ album.name }}</h4>
+                <p>Released: {{ album.releaseDate | date:'mediumDate' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="songs.length > 0" class="songs-container">
+        <h3>{{ songSectionTitle }}</h3>
+        <div class="songs-grid">
+            <div *ngFor="let song of songs" class="song-card">
+                <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
+
+                ```
+                <div class="song-info">
+                    <h3 class="song-title">{{ song.title }}</h3>
+                    <p class="song-artist">{{ song.artistNames?.join(', ') }}</p>
+                    <p *ngIf="song.genres?.length" class="song-genres">Genres: {{ song.genres.join(', ') }}</p>
+
+                    <div class="audio-player-wrapper">
+                        <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata(song, $event)"
+                            (timeupdate)="onTimeUpdate(song, $event)"></audio>
+                        <button (click)="togglePlay(song, audioElem)" class="play-btn">{{ song.isPlaying ? '❚❚' : '▶'
+                            }}</button>
+                        <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
+                            (input)="seek(song, audioElem)" class="audio-slider" />
+                        <span class="time">{{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        ```
+
+    </div>
+</div>

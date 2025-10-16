@@ -3,7 +3,7 @@ import boto3
 from songs.utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
-artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])
+albums_table = dynamodb.Table(os.environ["ALBUMS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 
 def get_genre_names(genre_ids):
@@ -18,14 +18,14 @@ def get_genre_names(genre_ids):
 
 def handler(event, context):
     try:
-        response = artists_table.scan()
-        artists = response.get("Items", [])
+        response = albums_table.scan()
+        albums = response.get("Items", [])
 
-        for artist in artists:
-            genre_ids = artist.get("genreIds", [])
-            artist["genres"] = get_genre_names(genre_ids)
+        for album in albums:
+            genre_ids = album.get("genreIds", [])
+            album["genres"] = get_genre_names(genre_ids)
 
-        return create_response(200, {"data": artists})
+        return create_response(200, {"data": albums})
 
     except Exception as e:
         return create_response(500, {"message": str(e)})

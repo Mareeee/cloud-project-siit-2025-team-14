@@ -10,6 +10,7 @@ import { MaterialModule } from './material/material.module';
 import { UploadMusicComponent } from './upload-music/upload-music.component';
 import { HomeComponent } from './home/home.component';
 import { ContentOverviewComponent } from './content-overview/content-overview.component';
+import { DiscoverComponent } from './discover/discover.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ContentOverviewComponent } from './content-overview/content-overview.co
     UploadMusicComponent,
     ContentOverviewComponent,
     ArtistCreationComponent,
-    HomeComponent
+    HomeComponent,
+    DiscoverComponent
   ],
   imports: [
     BrowserModule,

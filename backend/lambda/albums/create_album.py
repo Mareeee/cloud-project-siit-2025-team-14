@@ -5,7 +5,7 @@ import boto3
 from songs.utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
-artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])
+albums_table = dynamodb.Table(os.environ["ALBUMS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 
 def get_or_create_genre(genre_name):
@@ -27,26 +27,26 @@ def get_or_create_genre(genre_name):
 def handler(event, context):
     try:
         body = json.loads(event["body"])
-        name = body.get("name")
-        biography = body.get("biography")
+        title = body.get("title")
+        release_date = body.get("releaseDate")
         genres = body.get("genres")
 
-        if not name or not biography or not genres:
-            return create_response(400, {"message": "name, biography and genres required"})
+        if not title or not release_date or not genres:
+            return create_response(400, {"message": "title, releaseDate and genres are required"})
 
-        artist_id = str(uuid.uuid4())
+        album_id = str(uuid.uuid4())
         genre_ids = set(get_or_create_genre(g) for g in genres)
 
-        artists_table.put_item(Item={
-            "id": artist_id,
-            "name": name,
-            "biography": biography,
+        albums_table.put_item(Item={
+            "id": album_id,
+            "title": title,
+            "releaseDate": release_date,
             "genreIds": list(genre_ids)
         })
 
         return create_response(200, {
-            "message": f'Artist "{name}" created',
-            "id": artist_id
+            "message": f'Album "{title}" created successfully.',
+            "id": album_id
         })
 
     except Exception as e:

@@ -7,13 +7,12 @@ import { Song } from '../models/song.model';
   providedIn: 'root',
 })
 export class SongsService {
-  constructor(private http: HttpClient) { }
-
   private apiUrl = 'https://35500nafx8.execute-api.eu-central-1.amazonaws.com';
   private stagePath = '/dev';
   private resourcePath = '/songs';
-
   private url = this.apiUrl + this.stagePath + this.resourcePath;
+
+  constructor(private http: HttpClient) { }
 
   getSongs(): Observable<{ data: Song[] }> {
     return this.http.get<{ data: Song[] }>(this.url);
@@ -54,5 +53,18 @@ export class SongsService {
           error: (err) => observer.error(err),
         });
     });
+
+  }
+
+  getSongsByGenre(genre: string): Observable<{ data: Song[] }> {
+    return this.http.get<{ data: Song[] }>(`${this.url}/genre/${encodeURIComponent(genre)}`);
+  }
+
+  getSongsByArtist(artistId: string): Observable<{ data: Song[] }> {
+    return this.http.get<{ data: Song[] }>(`${this.url}/artist/${artistId}`);
+  }
+
+  getSongsByAlbum(albumId: string): Observable<{ data: Song[] }> {
+    return this.http.get<{ data: Song[] }>(`${this.url}/album/${albumId}`);
   }
 }

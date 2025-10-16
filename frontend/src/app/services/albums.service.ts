@@ -5,23 +5,23 @@ import { Observable } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export class ArtistsService {
+export class AlbumsService {
     private apiUrl = 'https://35500nafx8.execute-api.eu-central-1.amazonaws.com';
     private stagePath = '/dev';
-    private resourcePath = '/artists';
+    private resourcePath = '/albums';
     private url = this.apiUrl + this.stagePath + this.resourcePath;
 
     constructor(private http: HttpClient) { }
 
-    createArtist(artist: { name: string; biography: string; genres: string[] }): Observable<any> {
-        return this.http.post<any>(this.url, artist);
+    createAlbum(album: { title: string; releaseDate: string; genres: string[] }): Observable<any> {
+        return this.http.post<any>(this.url, album);
     }
 
-    getArtists(): Observable<{ data: any[] }> {
+    getAlbums(): Observable<{ data: any[] }> {
         return this.http.get<{ data: any[] }>(this.url);
     }
 
-    getArtistsByGenre(genre: string): Observable<{ data: any[] }> {
+    getAlbumsByGenre(genre: string): Observable<{ data: any[] }> {
         return this.http.get<{ data: any[] }>(`${this.url}/genre/${encodeURIComponent(genre)}`);
     }
 }

@@ -3,21 +3,29 @@ import boto3
 from songs.utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table(os.environ["SONGS_TABLE"])
+songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
+genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 s3 = boto3.client("s3")
 bucket_name = os.environ["MEDIA_BUCKET"]
 
+def get_genre_names(genre_ids):
+    if not genre_ids:
+        return []
+    names = []
+    for gid in genre_ids:
+        res = genres_table.get_item(Key={"id": gid})
+        if "Item" in res:
+            names.append(res["Item"]["name"])
+    return names
+
 def handler(event, context):
     try:
-        response = table.scan()
+        response = songs_table.scan()
         songs = response.get("Items", [])
 
         for song in songs:
-            genres = song.get("genres", [])
-            if isinstance(genres, set):
-                song["genres"] = list(genres)
-            elif not isinstance(genres, list):
-                song["genres"] = [str(genres)]
+            genre_ids = song.get("genreIds", [])
+            song["genres"] = get_genre_names(genre_ids)
 
             audio_key = song.get("s3KeyAudio")
             if audio_key:

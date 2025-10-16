@@ -1,0 +1,52 @@
+.discover-container {
+padding: 2vh;
+min-height: 90vh;
+background-color: #121212;
+color: #fff;
+font-family: 'Arial', sans-serif;
+}
+
+.filter-section {
+text-align: center;
+margin-bottom: 2rem;
+}
+
+select {
+margin-left: 1rem;
+padding: 0.5rem;
+background: #1e1e1e;
+color: #fff;
+border: 1px solid #333;
+border-radius: 6px;
+}
+
+.section h3 {
+margin-top: 2rem;
+text-align: center;
+color: #1f27cf;
+}
+
+.grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
+margin-top: 1rem;
+}
+
+.card {
+background: #1e1e1e;
+padding: 1rem;
+border-radius: 10px;
+text-align: center;
+transition: transform 0.2s, box-shadow 0.2s;
+cursor: pointer;
+}
+
+.card:hover {
+transform: translateY(-3px);
+box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.songs-container {
+margin-top: 2rem;
+}
