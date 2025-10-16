@@ -10,6 +10,7 @@ import { MaterialModule } from './material/material.module';
 import { UploadMusicComponent } from './upload-music/upload-music.component';
 import { HomeComponent } from './home/home.component';
 import { ContentOverviewComponent } from './content-overview/content-overview.component';
+import { AuthModule } from './auth/auth.module';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { ContentOverviewComponent } from './content-overview/content-overview.co
     BrowserModule,
     FormsModule,
     MaterialModule,
-    AppRoutingModule
+    AppRoutingModule,
+    AuthModule
   ],
   providers: [
     provideClientHydration(),
