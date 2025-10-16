@@ -8,7 +8,24 @@ from songs.utils.utils import create_response
 s3 = boto3.client("s3")
 bucket = os.environ["MEDIA_BUCKET"]
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table(os.environ["SONGS_TABLE"])
+songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
+genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
+
+def get_or_create_genre(genre_name):
+    response = genres_table.scan(
+        FilterExpression="name = :name_val",
+        ExpressionAttributeValues={":name_val": genre_name}
+    )
+    items = response.get("Items", [])
+    if items:
+        return items[0]["id"]
+
+    genre_id = str(uuid.uuid4())
+    genres_table.put_item(Item={
+        "id": genre_id,
+        "name": genre_name
+    })
+    return genre_id
 
 def handler(event, context):
     try:
@@ -25,6 +42,8 @@ def handler(event, context):
             return create_response(400, {"message": "All fields are required."})
         
         song_id = str(uuid.uuid4())
+        genre_ids = set(get_or_create_genre(g) for g in genres)
+
         s3_cover_key = f"{song_id}/cover/{cover_filename}"
         s3_audio_key = f"{song_id}/audio/{audio_filename}"
 
@@ -44,7 +63,7 @@ def handler(event, context):
             "id": song_id,
             "title": title,
             "artistIds": set(artist_ids),
-            "genres": set(genres),
+            "genreIds": list(genre_ids),
             "s3KeyCover": s3_cover_key,
             "s3KeyAudio": s3_audio_key,
             "creationDate": datetime.utcnow().isoformat()
@@ -53,7 +72,7 @@ def handler(event, context):
         if album_id:
             item["album_id"] = album_id
 
-        table.put_item(Item=item)
+        songs_table.put_item(Item=item)
 
         return create_response(200, {
             "message": f'Song "{title}" ready for upload.',

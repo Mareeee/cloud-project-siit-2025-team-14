@@ -1,6 +1,6 @@
 import aws_cdk as core
 import aws_cdk.assertions as assertions
-from backend.backend_stack import BackendStack
+from backend_stack.backend_stack import BackendStack
 
 
 def test_sqs_queue_created():
