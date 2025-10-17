@@ -88,6 +88,16 @@ class SongsStack(Stack):
             }
         )
 
+        self.presign_lambda = _lambda.Function(
+            self, "PresignLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda"),
+            handler="presign.generate_presign_url.handler",
+            environment={
+                "MEDIA_BUCKET": self.media_bucket.bucket_name
+            }
+        )
+
         self.songs_table.grant_read_write_data(self.create_song_lambda)
         self.songs_table.grant_read_write_data(self.get_songs_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_genre_lambda)
@@ -95,3 +105,4 @@ class SongsStack(Stack):
         self.songs_table.grant_read_data(self.get_songs_by_album_lambda)
         self.media_bucket.grant_read_write(self.create_song_lambda)
         self.media_bucket.grant_read_write(self.get_songs_lambda)
+        self.media_bucket.grant_put(self.presign_lambda)
