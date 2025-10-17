@@ -89,6 +89,7 @@ def handler(event, context):
                 "title": "Bohemian Rhapsody",
                 "artistIds": [artist_map["Queen"]],
                 "genreIds": [genre_map["Rock"]],
+                "genres": ["Rock"],
                 "album_id": album_map["Greatest Hits"],
             },
             {
@@ -96,6 +97,7 @@ def handler(event, context):
                 "title": "Hello",
                 "artistIds": [artist_map["Adele"]],
                 "genreIds": [genre_map["Pop"], genre_map["Jazz"]],
+                "genres": ["Pop", "Jazz"],
                 "album_id": album_map["25"],
             },
             {
@@ -103,6 +105,7 @@ def handler(event, context):
                 "title": "Not Afraid",
                 "artistIds": [artist_map["Eminem"]],
                 "genreIds": [genre_map["Hip-Hop"]],
+                "genres": ["Hip-Hop"],
                 "album_id": album_map["Recovery"],
             },
             {
@@ -110,6 +113,7 @@ def handler(event, context):
                 "title": "Nuvole Bianche",
                 "artistIds": [artist_map["Ludovico Einaudi"]],
                 "genreIds": [genre_map["Classical"], genre_map["Jazz"]],
+                "genres": ["Classical", "Jazz"],
                 "album_id": album_map["Elements"],
             },
         ]

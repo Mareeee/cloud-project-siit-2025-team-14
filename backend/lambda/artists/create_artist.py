@@ -1,8 +1,8 @@
-import uuid
-import json
 import os
 import boto3
-from songs.utils.utils import create_response
+import uuid
+import json
+from artists.utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])
@@ -10,43 +10,44 @@ genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 
 def get_or_create_genre(genre_name):
     response = genres_table.scan(
-        FilterExpression="name = :name_val",
-        ExpressionAttributeValues={":name_val": genre_name}
+        FilterExpression="#n = :g",
+        ExpressionAttributeNames={"#n": "name"},
+        ExpressionAttributeValues={":g": genre_name}
     )
     items = response.get("Items", [])
     if items:
         return items[0]["id"]
 
     genre_id = str(uuid.uuid4())
-    genres_table.put_item(Item={
-        "id": genre_id,
-        "name": genre_name
-    })
+    genres_table.put_item(Item={"id": genre_id, "name": genre_name})
     return genre_id
+
 
 def handler(event, context):
     try:
         body = json.loads(event["body"])
         name = body.get("name")
-        biography = body.get("biography")
-        genres = body.get("genres")
+        biography = body.get("biography", "")
+        genres = body.get("genres", [])
 
-        if not name or not biography or not genres:
-            return create_response(400, {"message": "name, biography and genres required"})
+        if not name or not genres:
+            return create_response(400, {"message": "Name and at least one genre are required."})
+
+        genre_ids = [get_or_create_genre(g) for g in genres]
 
         artist_id = str(uuid.uuid4())
-        genre_ids = set(get_or_create_genre(g) for g in genres)
-
-        artists_table.put_item(Item={
+        item = {
             "id": artist_id,
             "name": name,
             "biography": biography,
-            "genreIds": list(genre_ids)
-        })
+            "genreIds": genre_ids
+        }
+
+        artists_table.put_item(Item=item)
 
         return create_response(200, {
-            "message": f'Artist "{name}" created',
-            "id": artist_id
+            "message": f"Artist '{name}' created successfully!",
+            "artist": item
         })
 
     except Exception as e:

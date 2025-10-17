@@ -15,8 +15,7 @@ def handler(event, context):
 
         response = table.scan(
             FilterExpression="contains(artistIds, :aid)",
-            ExpressionAttributeValues={":aid": artist_id},
-            ExpressionAttributeNames={"#t": "title"}
+            ExpressionAttributeValues={":aid": artist_id}
         )
 
         songs = response.get("Items", [])

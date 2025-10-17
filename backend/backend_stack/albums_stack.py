@@ -36,7 +36,8 @@ class AlbumsStack(Stack):
             code=_lambda.Code.from_asset('lambda'),
             handler='albums.get_albums.handler',
             environment={
-                "ALBUMS_TABLE": self.albums_table.table_name
+                "ALBUMS_TABLE": self.albums_table.table_name,
+                "GENRES_TABLE": genres_table.table_name
             }
         )
 
@@ -54,4 +55,6 @@ class AlbumsStack(Stack):
         self.albums_table.grant_read_write_data(self.create_album_lambda)
         self.albums_table.grant_read_write_data(self.get_albums_lambda)
         self.albums_table.grant_read_data(self.get_albums_by_genre_lambda)
+        genres_table.grant_read_write_data(self.create_album_lambda)
+        genres_table.grant_read_data(self.get_albums_lambda)
         genres_table.grant_read_data(self.get_albums_by_genre_lambda)

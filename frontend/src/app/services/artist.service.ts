@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class ArtistsService {
-    private apiUrl = 'https://35500nafx8.execute-api.eu-central-1.amazonaws.com';
+    private apiUrl = 'https://0ms84h98gd.execute-api.eu-central-1.amazonaws.com';
     private stagePath = '/dev';
     private resourcePath = '/artists';
     private url = this.apiUrl + this.stagePath + this.resourcePath;

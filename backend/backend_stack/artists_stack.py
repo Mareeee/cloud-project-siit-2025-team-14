@@ -36,7 +36,8 @@ class ArtistsStack(Stack):
             code=_lambda.Code.from_asset('lambda'),
             handler='artists.get_artists.handler',
             environment={
-                "ARTISTS_TABLE": self.artists_table.table_name
+                "ARTISTS_TABLE": self.artists_table.table_name,
+                "GENRES_TABLE": genres_table.table_name
             }
         )
 
@@ -54,4 +55,6 @@ class ArtistsStack(Stack):
         self.artists_table.grant_read_write_data(self.create_artist_lambda)
         self.artists_table.grant_read_write_data(self.get_artists_lambda)
         self.artists_table.grant_read_data(self.get_artists_by_genre_lambda)
+        genres_table.grant_read_data(self.create_artist_lambda)
         genres_table.grant_read_data(self.get_artists_by_genre_lambda)
+        genres_table.grant_read_data(self.get_artists_lambda)

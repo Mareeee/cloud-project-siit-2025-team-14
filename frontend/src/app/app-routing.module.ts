@@ -7,7 +7,7 @@ import { UploadMusicComponent } from './upload-music/upload-music.component';
 import { DiscoverComponent } from './discover/discover.component';
 
 const routes: Routes = [
-  { path: '', component: DiscoverComponent },
+  { path: '', component: ArtistCreationComponent },
   { path: 'content-overview', component: ContentOverviewComponent },
   { path: 'artist-create', component: ArtistCreationComponent },
   { path: 'music-upload', component: UploadMusicComponent },
