@@ -1,7 +1,8 @@
 from constructs import Construct
 from aws_cdk import (
     Stack,
-    aws_apigateway as apigw
+    aws_apigateway as apigw,
+    aws_cognito as cognito
 )
 
 class ApiStack(Stack):
@@ -19,6 +20,18 @@ class ApiStack(Stack):
         **kwargs
     ):
         super().__init__(scope, construct_id, **kwargs)
+
+        # user_pool = cognito.UserPool.from_user_pool_id(
+        #     self, "UserPool", "<OVDE UBACI UserPoolId>"
+        # )
+
+        # authorizer = apigw.CognitoUserPoolsAuthorizer(
+        #     self, "ApiAuthorizer",
+        #     cognito_user_pools=[user_pool]
+        # )
+
+        # authorization_type=apigw.AuthorizationType.COGNITO,
+        # authorizer=authorizer
 
         api = apigw.RestApi(
             self, "SongsApi",

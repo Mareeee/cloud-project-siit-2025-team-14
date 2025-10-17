@@ -33,7 +33,8 @@ class AuthStack(Stack):
                 require_digits=True,
                 require_symbols=False
             ),
-            account_recovery=cognito.AccountRecovery.EMAIL_ONLY
+            account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
+            removal_policy=RemovalPolicy.DESTROY  # za testiranje
         )
 
         user_pool_client = user_pool.add_client(
@@ -45,6 +46,18 @@ class AuthStack(Stack):
                 user_srp=True
             ),
             prevent_user_existence_errors=True
+        )
+
+        admin_group = cognito.CfnUserPoolGroup(
+            self, "AdminGroup",
+            group_name="Admin",
+            user_pool_id=user_pool.user_pool_id
+        )
+
+        user_group = cognito.CfnUserPoolGroup(
+            self, "UserGroup",
+            group_name="User",
+            user_pool_id=user_pool.user_pool_id
         )
 
         hosting_bucket = s3.Bucket(
