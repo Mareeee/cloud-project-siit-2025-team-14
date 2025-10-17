@@ -1,0 +1,30 @@
+import os
+import json
+import uuid
+import boto3
+from subscriptions.utils.utils import create_response
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(os.environ["SUBSCRIPTIONS_TABLE"])
+
+def handler(event, context):
+    try:
+        body = json.loads(event["body"])
+        user_id = body.get("userId")
+        target_id = body.get("targetId")
+        target_type = body.get("targetType")
+
+        if not user_id or not target_id or not target_type:
+            return create_response(400, {"message": "Missing required fields."})
+
+        subscription_id = str(uuid.uuid4())
+        table.put_item(Item={
+            "userId": user_id,
+            "targetId": target_id,
+            "targetType": target_type,
+            "subscriptionId": subscription_id
+        })
+
+        return create_response(200, {"message": "Subscribed successfully", "subscriptionId": subscription_id})
+    except Exception as e:
+        return create_response(500, {"message": str(e)})
