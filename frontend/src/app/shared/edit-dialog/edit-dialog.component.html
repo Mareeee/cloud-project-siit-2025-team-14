@@ -1,0 +1,95 @@
+<div class="center-container">
+    <form [formGroup]="form" class="upload-music-form" (ngSubmit)="save()">
+        <div class="form-title">
+            <h2>Edit Music</h2>
+        </div>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Song Title</mat-label>
+            <input matInput required formControlName="title" />
+            <mat-error *ngIf="form.get('title')?.invalid && form.get('title')?.touched">
+                Please enter song title.
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Genres</mat-label>
+            <mat-select multiple required formControlName="genres">
+                <mat-option *ngFor="let genre of genres" [value]="genre">{{ genre }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('genres')?.invalid && form.get('genres')?.touched">
+                Please select song genres.
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Artist</mat-label>
+            <mat-select multiple required formControlName="artistIds">
+                <mat-option *ngFor="let artist of artists" [value]="artist.id">{{ artist.name }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('artistIds')?.invalid && form.get('artistIds')?.touched">
+                Please select song artist.
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Album</mat-label>
+            <mat-select formControlName="albumId">
+                <mat-option *ngFor="let album of albums" [value]="album.id">{{ album.title }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="cover-upload-container">
+            <label class="cover-label">Cover Image</label>
+            <div class="cover-preview-wrapper">
+                <div class="cover-preview" (click)="coverInput.click()">
+                    <ng-container *ngIf="coverPreview; else addCover">
+                        <img [src]="coverPreview" alt="Cover Preview" />
+                    </ng-container>
+                    <ng-template #addCover>
+                        <div class="add-cover-btn"><mat-icon>add_circle</mat-icon></div>
+                    </ng-template>
+                </div>
+                <button *ngIf="coverPreview" type="button" class="remove-cover"
+                    (click)="removeCover(); $event.stopPropagation()">
+                    <mat-icon>remove_circle</mat-icon>
+                </button>
+                <input #coverInput type="file" accept="image/*" (change)="onCoverSelected($event)" hidden />
+            </div>
+        </div>
+
+        <div class="audio-upload-container">
+            <label class="audio-label">Audio File</label>
+            <div class="audio-preview-wrapper">
+                <ng-container *ngIf="audioPreview; else addAudio">
+                    <audio controls [src]="audioPreview"></audio>
+                    <button type="button" class="remove-audio" (click)="removeAudio()">
+                        <mat-icon>remove_circle</mat-icon>
+                    </button>
+                </ng-container>
+                <ng-template #addAudio>
+                    <label class="custom-file-upload">
+                        <input type="file" accept="audio/*" (change)="onAudioSelected($event)" hidden />
+                        <mat-icon>add_circle</mat-icon>
+                    </label>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="upload-spinner" *ngIf="isUploading" style="margin: 20px auto;">
+            <mat-progress-spinner mode="indeterminate" diameter="40" color="accent"
+                class="light-spinner"></mat-progress-spinner>
+        </div>
+
+        <div class="form-check full-width" style="margin: 20px 0; color: #fff;">
+            <mat-checkbox formControlName="isFullAlbum" class="light-checkbox" color="accent">
+                Add as part of a full album
+            </mat-checkbox>
+        </div>
+
+        <div class="form-buttons">
+            <button mat-raised-button type="button" class="cancel" (click)="cancel()">Cancel</button>
+            <button mat-raised-button class="submit" type="submit">Save</button>
+        </div>
+    </form>
+</div>

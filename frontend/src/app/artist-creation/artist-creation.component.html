@@ -2,11 +2,18 @@
     <div class="artist-card">
         <h1 class="artist-title">Create Artist</h1>
 
-        <input type="text" placeholder="Artist Name" [(ngModel)]="newArtist.name" class="full-width" />
-        <textarea placeholder="Biography" rows="4" [(ngModel)]="newArtist.biography" class="full-width"></textarea>
+        <input type="text" placeholder="Artist Name" [(ngModel)]="newArtist.name" (blur)="touched.name = true"
+            class="full-width" [class.invalid]="touched.name && !nameValid" />
+        <div class="error" *ngIf="touched.name && !nameValid">
+            Name is required (min 2 characters).
+        </div>
+
+        <textarea placeholder="Biography (optional)" rows="4" [(ngModel)]="newArtist.biography"
+            class="full-width"></textarea>
 
         <div class="dropdown-container">
-            <button type="button" class="dropdown-btn" (click)="toggleDropdown()">
+            <button type="button" class="dropdown-btn" (click)="toggleDropdown()"
+                [class.invalid]="touched.genres && !genresValid">
                 {{ newArtist.genres.length ? newArtist.genres.join(', ') : 'Select Genres' }}
                 <span class="arrow" [class.open]="dropdownOpen">&#9662;</span>
             </button>
@@ -18,8 +25,13 @@
                 </label>
             </div>
         </div>
+        <div class="error" *ngIf="touched.genres && !genresValid">
+            Select at least one genre.
+        </div>
 
-        <button (click)="createArtist()" class="create-btn">Create Artist</button>
+        <button (click)="createArtist()" class="create-btn" [disabled]="!formValid">
+            Create Artist
+        </button>
     </div>
 
     <div class="snackbar" [class.show]="showSnackbar">{{ snackbarMessage }}</div>
