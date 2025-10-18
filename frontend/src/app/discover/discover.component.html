@@ -1,0 +1,69 @@
+<div class="discover-container">
+    <h2 class="page-title">Discover Music</h2>
+
+    <div class="filter-section">
+        <mat-form-field appearance="outline" class="genre-field">
+            <mat-label>Filter by Genre</mat-label>
+            <mat-select [(value)]="selectedGenre" (selectionChange)="onGenreChange()">
+                <mat-option *ngFor="let genre of availableGenres" [value]="genre">{{ genre }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" color="accent" diameter="50"
+        style="margin: 20px auto; display:block;"></mat-progress-spinner>
+
+    <section *ngIf="artists.length > 0" class="section">
+        <h3>Artists</h3>
+        <div class="grid">
+            <mat-card *ngFor="let artist of artists" class="music-card" (click)="showArtistSongs(artist.id)">
+                <mat-card-header>
+                    <mat-card-title>{{ artist.name }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>{{ artist.biography || 'No biography available.' }}</p>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </section>
+
+    <section *ngIf="albums.length > 0" class="section">
+        <h3>Albums</h3>
+        <div class="grid">
+            <mat-card *ngFor="let album of albums" class="music-card" (click)="showAlbumSongs(album.id)">
+                <mat-card-header>
+                    <mat-card-title>{{ album.title }}</mat-card-title>
+                    <mat-card-subtitle>Released: {{ album.releaseDate | date:'mediumDate' }}</mat-card-subtitle>
+                </mat-card-header>
+            </mat-card>
+        </div>
+    </section>
+
+    <section *ngIf="songs.length > 0" class="section songs-section">
+        <h3>{{ songSectionTitle }}</h3>
+        <div class="songs-grid">
+            <mat-card *ngFor="let song of songs" class="song-card">
+                <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
+                <mat-card-content class="song-info">
+                    <h4 class="song-title">{{ song.title }}</h4>
+                    <p class="song-artist">{{ song.artistNames?.join(', ') }}</p>
+                    <p *ngIf="song.genres?.length" class="song-genres">
+                        Genres: {{ song.genres.join(', ') }}
+                    </p>
+
+                    <div class="audio-player-wrapper">
+                        <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata(song, $event)"
+                            (timeupdate)="onTimeUpdate(song, $event)">
+                        </audio>
+                        <button mat-mini-fab color="accent" (click)="togglePlay(song, audioElem)">
+                            {{ song.isPlaying ? '❚❚' : '▶' }}
+                        </button>
+                        <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
+                            (input)="seek(song, audioElem)" class="audio-slider" />
+                        <span class="time">{{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}</span>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </section>
+</div>

@@ -1,6 +1,6 @@
 import os
 import boto3
-from songs.utils.utils import create_response
+from artists.utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])
@@ -11,9 +11,15 @@ def get_genre_names(genre_ids):
         return []
     names = []
     for gid in genre_ids:
-        res = genres_table.get_item(Key={"id": gid})
-        if "Item" in res:
-            names.append(res["Item"]["name"])
+        if not isinstance(gid, str):
+            continue
+        try:
+            res = genres_table.get_item(Key={"id": gid})
+            item = res.get("Item")
+            if item and "name" in item:
+                names.append(item["name"])
+        except Exception as e:
+            print(f"Error fetching genre {gid}: {e}")
     return names
 
 def handler(event, context):

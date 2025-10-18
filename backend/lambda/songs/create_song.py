@@ -13,7 +13,8 @@ genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 
 def get_or_create_genre(genre_name):
     response = genres_table.scan(
-        FilterExpression="name = :name_val",
+        FilterExpression="#n = :name_val",
+        ExpressionAttributeNames={"#n": "name"},
         ExpressionAttributeValues={":name_val": genre_name}
     )
     items = response.get("Items", [])
@@ -42,7 +43,7 @@ def handler(event, context):
             return create_response(400, {"message": "All fields are required."})
         
         song_id = str(uuid.uuid4())
-        genre_ids = set(get_or_create_genre(g) for g in genres)
+        genre_ids = [get_or_create_genre(g) for g in genres]
 
         s3_cover_key = f"{song_id}/cover/{cover_filename}"
         s3_audio_key = f"{song_id}/audio/{audio_filename}"
@@ -62,8 +63,8 @@ def handler(event, context):
         item = {
             "id": song_id,
             "title": title,
-            "artistIds": set(artist_ids),
-            "genreIds": list(genre_ids),
+            "artistIds": artist_ids,
+            "genreIds": genre_ids,
             "s3KeyCover": s3_cover_key,
             "s3KeyAudio": s3_audio_key,
             "creationDate": datetime.utcnow().isoformat()

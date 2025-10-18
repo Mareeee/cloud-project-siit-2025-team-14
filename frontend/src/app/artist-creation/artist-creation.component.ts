@@ -1,22 +1,41 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ArtistsService } from '../services/artist.service';
+import { GenresService } from '../services/genres.service';
 import { Artist } from '../models/artist.model';
-import { AVAILABLE_GENRES } from '../utils/genres';
+import { Genre } from '../models/genre.model';
 
 @Component({
   selector: 'app-artist-creation',
   templateUrl: './artist-creation.component.html',
   styleUrls: ['./artist-creation.component.css']
 })
-export class ArtistCreationComponent {
+export class ArtistCreationComponent implements OnInit {
   newArtist: Artist = { id: '', name: '', biography: '', genres: [] };
-  availableGenres = AVAILABLE_GENRES;
+  availableGenres: string[] = [];
   dropdownOpen = false;
 
   showSnackbar = false;
   snackbarMessage = '';
 
-  constructor(private artistsService: ArtistsService) { }
+  constructor(
+    private artistsService: ArtistsService,
+    private genresService: GenresService
+  ) { }
+
+  ngOnInit() {
+    this.loadGenres();
+  }
+
+  loadGenres() {
+    this.genresService.getGenres().subscribe({
+      next: (res) => {
+        this.availableGenres = res.data.map((g: Genre) => g.name);
+      },
+      error: (err) => {
+        this.triggerSnackbar('Failed to load genres: ' + err.message, false);
+      }
+    });
+  }
 
   toggleGenre(genre: string) {
     const index = this.newArtist.genres.indexOf(genre);

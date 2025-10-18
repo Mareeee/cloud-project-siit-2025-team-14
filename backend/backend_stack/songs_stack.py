@@ -40,7 +40,8 @@ class SongsStack(Stack):
             handler='songs.get_songs.handler',
             environment={
                 "SONGS_TABLE": self.songs_table.table_name,
-                "MEDIA_BUCKET": self.media_bucket.bucket_name
+                "MEDIA_BUCKET": self.media_bucket.bucket_name,
+                "GENRES_TABLE": genres_table.table_name
             }
         )
 
@@ -51,7 +52,8 @@ class SongsStack(Stack):
             handler='songs.create_song.handler',
             environment={
                 "SONGS_TABLE": self.songs_table.table_name,
-                "MEDIA_BUCKET": self.media_bucket.bucket_name
+                "MEDIA_BUCKET": self.media_bucket.bucket_name,
+                "GENRES_TABLE": genres_table.table_name
             }
         )
 
@@ -106,3 +108,6 @@ class SongsStack(Stack):
         self.media_bucket.grant_read_write(self.create_song_lambda)
         self.media_bucket.grant_read_write(self.get_songs_lambda)
         self.media_bucket.grant_put(self.presign_lambda)
+
+        genres_table.grant_read_write_data(self.create_song_lambda)
+        genres_table.grant_read_data(self.get_songs_lambda)

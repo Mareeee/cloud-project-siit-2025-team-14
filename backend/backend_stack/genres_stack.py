@@ -2,6 +2,7 @@ from constructs import Construct
 from aws_cdk import (
     Stack,
     RemovalPolicy,
+    aws_lambda as _lambda,
     aws_dynamodb as dynamodb
 )
 
@@ -17,3 +18,15 @@ class GenresStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY
         )
+
+        self.get_genres_lambda = _lambda.Function(
+            self, 'GetGenresLambda',
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='genres.get_genres.handler',
+            environment={
+                "GENRES_TABLE": self.genres_table.table_name
+            }
+        )
+
+        self.genres_table.grant_read_data(self.get_genres_lambda)

@@ -16,6 +16,7 @@ class ApiStack(Stack):
         subscriptions_stack,
         notifications_stack,
         transcription_stack,
+        genres_stack,
         **kwargs
     ):
         super().__init__(scope, construct_id, **kwargs)
@@ -44,6 +45,9 @@ class ApiStack(Stack):
         songs_res.add_resource("album").add_resource("{albumId}").add_method(
             "GET", apigw.LambdaIntegration(songs_stack.get_songs_by_album_lambda)
         )
+
+        genres_res = api.root.add_resource("genres")
+        genres_res.add_method("GET", apigw.LambdaIntegration(genres_stack.get_genres_lambda))
 
         artists_res = api.root.add_resource("artists")
         artists_res.add_method("GET", apigw.LambdaIntegration(artists_stack.get_artists_lambda))
