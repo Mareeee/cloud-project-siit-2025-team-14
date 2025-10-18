@@ -13,23 +13,19 @@ def handler(event, context):
         if not genre:
             return create_response(400, {"message": "Genre parameter required."})
 
-        # Fix for reserved keyword "title"
         response = table.scan(
             FilterExpression="contains(genres, :g)",
-            ExpressionAttributeValues={":g": genre},
-            ExpressionAttributeNames={"#t": "title"}
+            ExpressionAttributeValues={":g": genre}
         )
 
         songs = response.get("Items", [])
         for song in songs:
-            # Normalize genres
             genres = song.get("genres", [])
             if isinstance(genres, set):
                 song["genres"] = list(genres)
             elif not isinstance(genres, list):
                 song["genres"] = [str(genres)]
 
-            # Generate presigned URLs
             audio_key = song.get("s3KeyAudio")
             if audio_key:
                 song["audioUrl"] = s3.generate_presigned_url(

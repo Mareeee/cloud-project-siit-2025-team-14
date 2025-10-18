@@ -1,0 +1,38 @@
+<nav class="sidebar">
+    <div class="brand">
+        <img class="logo" src="../../../assets/zvezde_granda.png" alt="logo" />
+    </div>
+
+    <div class="section">
+        <a class="link" href="#" title="Sign in">Sign in</a>
+        <a class="link" href="#" title="Register">Register</a>
+        <a class="link" href="#" title="Sign out">Sign out</a>
+    </div>
+
+    <div class="section">
+        <a class="link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Feed</a>
+
+        <a class="link" routerLink="/discover" routerLinkActive="active">Discover</a>
+
+        <a class="link" routerLink="/playlists" routerLinkActive="active">Playlists</a>
+
+        <a class="link" routerLink="/subscriptions" routerLinkActive="active">Subscriptions</a>
+
+        <a class="link" routerLink="/downloads" routerLinkActive="active">Offline</a>
+
+        <a class="link" routerLink="/content-overview" routerLinkActive="active">Browse</a>
+    </div>
+
+    <div class="section admin">
+        <div class="section-label">Admin</div>
+        <a class="link" routerLink="/artist-create" routerLinkActive="active">
+            Artists
+        </a>
+        <a class="link" routerLink="/music-upload" routerLinkActive="active">
+            Upload
+        </a>
+        <a class="link" routerLink="/content-overview" routerLinkActive="active">
+            Manage Content
+        </a>
+    </div>
+</nav>

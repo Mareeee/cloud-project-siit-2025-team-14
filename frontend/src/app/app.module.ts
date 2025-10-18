@@ -6,12 +6,18 @@ import { ArtistCreationComponent } from './artist-creation/artist-creation.compo
 import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { FormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MaterialModule } from './material/material.module';
 import { UploadMusicComponent } from './upload-music/upload-music.component';
 import { HomeComponent } from './home/home.component';
 import { ContentOverviewComponent } from './content-overview/content-overview.component';
 import { AuthModule } from './auth/auth.module';
 import { AuthInterceptor } from './auth/auth.guard';
+import { DiscoverComponent } from './discover/discover.component';
+import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +25,9 @@ import { AuthInterceptor } from './auth/auth.guard';
     UploadMusicComponent,
     ContentOverviewComponent,
     ArtistCreationComponent,
-    HomeComponent
+    HomeComponent,
+    DiscoverComponent,
+    AlbumsCreationComponent
   ],
   imports: [
     BrowserModule,
@@ -27,6 +35,10 @@ import { AuthInterceptor } from './auth/auth.guard';
     MaterialModule,
     AppRoutingModule,
     AuthModule
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
+    SharedModule,
   ],
   providers: [
     provideClientHydration(),

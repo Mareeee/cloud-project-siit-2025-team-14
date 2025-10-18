@@ -13,9 +13,15 @@ def get_genre_names(genre_ids):
         return []
     names = []
     for gid in genre_ids:
-        res = genres_table.get_item(Key={"id": gid})
-        if "Item" in res:
-            names.append(res["Item"]["name"])
+        if not isinstance(gid, str):
+            continue
+        try:
+            res = genres_table.get_item(Key={"id": gid})
+            item = res.get("Item")
+            if item and "name" in item:
+                names.append(item["name"])
+        except Exception as e:
+            print(f"Error fetching genre {gid}: {e}")
     return names
 
 def handler(event, context):
