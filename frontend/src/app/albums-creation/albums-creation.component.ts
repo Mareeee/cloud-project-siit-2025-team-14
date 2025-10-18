@@ -22,6 +22,8 @@ export class AlbumsCreationComponent implements OnInit {
   selectedArtistIds: string[] = [];
   createFullAlbum = false;
 
+  touched = { title: false, releaseDate: false, genres: false };
+
   showSnackbar = false;
   snackbarMessage = '';
 
@@ -51,6 +53,19 @@ export class AlbumsCreationComponent implements OnInit {
     });
   }
 
+  get titleValid(): boolean {
+    return !!this.newAlbum.title && this.newAlbum.title.trim().length >= 2;
+  }
+  get dateValid(): boolean {
+    return !!this.newAlbum.releaseDate;
+  }
+  get genresValid(): boolean {
+    return this.newAlbum.genres.length > 0;
+  }
+  get formValid(): boolean {
+    return this.titleValid && this.dateValid && this.genresValid;
+  }
+
   toggleArtist(id: string) {
     const index = this.selectedArtistIds.indexOf(id);
     if (index > -1) this.selectedArtistIds.splice(index, 1);
@@ -61,15 +76,11 @@ export class AlbumsCreationComponent implements OnInit {
     const index = this.newAlbum.genres.indexOf(genre);
     if (index > -1) this.newAlbum.genres.splice(index, 1);
     else this.newAlbum.genres.push(genre);
+    this.touched.genres = true;
   }
 
-  toggleArtistDropdown() {
-    this.artistDropdownOpen = !this.artistDropdownOpen;
-  }
-
-  toggleGenreDropdown() {
-    this.genreDropdownOpen = !this.genreDropdownOpen;
-  }
+  toggleArtistDropdown() { this.artistDropdownOpen = !this.artistDropdownOpen; }
+  toggleGenreDropdown() { this.genreDropdownOpen = !this.genreDropdownOpen; }
 
   getSelectedArtists() {
     return this.availableArtists
@@ -79,16 +90,20 @@ export class AlbumsCreationComponent implements OnInit {
   }
 
   createAlbum() {
-    if (!this.newAlbum.title || !this.newAlbum.releaseDate || !this.newAlbum.genres.length) {
+    this.touched.title = true;
+    this.touched.releaseDate = true;
+    this.touched.genres = true;
+
+    if (!this.formValid) {
       this.triggerSnackbar('Please fill all required fields.', false);
       return;
     }
 
     const payload = {
-      title: this.newAlbum.title,
+      title: this.newAlbum.title.trim().replace(/\s+/g, ' '),
       releaseDate: this.newAlbum.releaseDate,
-      genres: this.newAlbum.genres,
-      artistIds: this.selectedArtistIds
+      genres: [...this.newAlbum.genres],
+      artistIds: [...this.selectedArtistIds]
     };
 
     this.albumsService.createAlbum(payload).subscribe({
@@ -98,11 +113,13 @@ export class AlbumsCreationComponent implements OnInit {
         setTimeout(() => {
           if (this.createFullAlbum)
             this.router.navigate(['/music-upload'], { queryParams: { albumTitle: payload.title } });
-          else this.router.navigate(['/discover']);
+          else
+            this.router.navigate(['/discover']);
         }, 1500);
 
         this.newAlbum = { id: '', title: '', releaseDate: '', genres: [] };
         this.selectedArtistIds = [];
+        this.touched = { title: false, releaseDate: false, genres: false };
       },
       error: (err) => {
         this.triggerSnackbar('Error creating album: ' + err.message, false);

@@ -16,8 +16,9 @@ import { DiscoverComponent } from './discover/discover.component';
 import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
-import { SharedModule } from './shared/shared.module';
 import { AuthInterceptor } from './auth/auth.interceptor';
+import { ManageContentComponent } from './admin/manage-content/manage-content.component';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { AuthInterceptor } from './auth/auth.interceptor';
     ArtistCreationComponent,
     HomeComponent,
     DiscoverComponent,
-    AlbumsCreationComponent
+    AlbumsCreationComponent,
+    ManageContentComponent,
   ],
   imports: [
     BrowserModule,
@@ -35,9 +37,6 @@ import { AuthInterceptor } from './auth/auth.interceptor';
     MaterialModule,
     AppRoutingModule,
     AuthModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatCardModule,
     SharedModule,
   ],
   providers: [

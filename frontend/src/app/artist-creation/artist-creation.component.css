@@ -154,7 +154,30 @@
 .dropdown-menu::-webkit-scrollbar {
   width: 8px;
 }
+
 .dropdown-menu::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 4px;
+}
+
+.full-width.invalid,
+.dropdown-btn.invalid {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(222, 78, 62, .55);
+}
+
+.error {
+  width: 100%;
+  max-width: 300px;
+  color: #ff6b6b;
+  font-size: .9rem;
+  margin-top: -12px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.create-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  filter: grayscale(.15);
 }

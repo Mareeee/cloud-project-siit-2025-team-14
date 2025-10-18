@@ -1,0 +1,177 @@
+:host {
+    --bg: #0f0f0f;
+    --card: #141414;
+    --card-2: #121212;
+    --border: rgba(255, 255, 255, .08);
+    --text: #eaeaea;
+    --muted: #a8a8a8;
+    --chip: #262626;
+    --accent: #1f54cf;
+}
+
+.wrap {
+    padding: 24px;
+}
+
+.loading,
+.empty {
+    color: #888;
+    padding: 16px;
+}
+
+.grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.mc-card {
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: #1e1e1e;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.mc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
+    border-color: rgba(255, 255, 255, .14);
+}
+
+.thumb {
+    width: 96px;
+    height: 96px;
+}
+
+.thumb img,
+.thumb-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #1e1e1e;
+    display: grid;
+    place-items: center;
+    color: #bbb;
+}
+
+.info {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.title {
+    margin: 0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.subtitle {
+    color: #b3b3b3;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chips {
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 44px;
+    overflow: hidden;
+}
+
+.chip {
+    background: var(--chip);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    padding: 2px 8px;
+    font-size: 12px;
+    color: #ddd;
+}
+
+.date {
+    color: #8e8e8e;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.icon.pill {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #eee;
+    border: 1px solid rgba(255, 255, 255, .12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, transform .06s, border-color .2s;
+}
+
+.icon.pill:hover {
+    background: #202020;
+    border-color: rgba(255, 255, 255, .24);
+}
+
+.icon.pill:active {
+    transform: translateY(1px);
+}
+
+.icon.pill.edit {
+    background: rgba(31, 101, 207, 0.12);
+    border-color: rgba(31, 101, 207, .35);
+}
+
+.icon.pill.edit:hover {
+    background: rgba(31, 39, 207, .25);
+    cursor: pointer;
+}
+
+.icon.pill.danger {
+    background: rgba(221, 80, 65, .12);
+    border-color: rgba(221, 80, 65, .35);
+}
+
+.icon.pill.danger:hover {
+    background: rgba(221, 80, 65, .18);
+    cursor: pointer;
+}
+
+:host ::ng-deep .mc-tabs .mdc-tab__text-label {
+    color: #e6e6e6 !important;
+    opacity: 1 !important;
+    font-weight: 600;
+}
+
+:host ::ng-deep .mc-tabs .mdc-tab--active .mdc-tab__text-label {
+    color: var(--accent) !important;
+}
+
+:host ::ng-deep .mc-tabs .mdc-tab-indicator__content--underline {
+    border-color: var(--accent) !important;
+}
+
+:host ::ng-deep .mc-tabs mat-tab-header {
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}

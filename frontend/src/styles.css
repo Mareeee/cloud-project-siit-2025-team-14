@@ -1,5 +1,12 @@
-html, body { height: 100%; }
-body { margin: 0; background-color: #121212; }
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #121212;
+}
 
 @font-face {
   font-family: 'SpotifyFont';
@@ -9,7 +16,7 @@ body { margin: 0; background-color: #121212; }
 }
 
 * {
-    font-family: 'SpotifyFont';
+  font-family: 'SpotifyFont';
 }
 
 .mat-mdc-text-field-wrapper.mdc-text-field {
@@ -82,4 +89,18 @@ input.mat-mdc-input-element {
 .mat-error {
   color: #ff6b6b;
   font-size: 0.9rem;
+}
+
+.plain-dialog .mat-mdc-dialog-surface {
+  background: transparent !important;
+  border-radius: 12px !important;
+}
+
+.cdk-overlay-backdrop.dark-backdrop {
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(1.5px);
+}
+
+.cdk-overlay-backdrop.dark-backdrop.cdk-overlay-backdrop-showing {
+  opacity: 1 !important;
 }

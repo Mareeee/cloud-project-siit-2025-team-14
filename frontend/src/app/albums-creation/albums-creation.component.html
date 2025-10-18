@@ -2,12 +2,21 @@
     <div class="album-card">
         <h1 class="album-title">Create Album</h1>
 
-        <input type="text" placeholder="Album Title" [(ngModel)]="newAlbum.title" class="full-width" />
+        <input type="text" placeholder="Album Title" [(ngModel)]="newAlbum.title" (blur)="touched.title = true"
+            class="full-width" [class.invalid]="touched.title && !titleValid" />
+        <div class="error" *ngIf="touched.title && !titleValid">
+            Title is required (min 2 characters).
+        </div>
 
-        <input type="date" [(ngModel)]="newAlbum.releaseDate" class="full-width" placeholder="Release Date" />
+        <input type="date" [(ngModel)]="newAlbum.releaseDate" (blur)="touched.releaseDate = true" class="full-width"
+            placeholder="Release Date" [class.invalid]="touched.releaseDate && !dateValid" />
+        <div class="error" *ngIf="touched.releaseDate && !dateValid">
+            Release date is required.
+        </div>
 
         <div class="dropdown-container">
-            <button type="button" class="dropdown-btn" (click)="toggleGenreDropdown()">
+            <button type="button" class="dropdown-btn" (click)="toggleGenreDropdown()"
+                [class.invalid]="touched.genres && !genresValid">
                 {{ newAlbum.genres.length ? newAlbum.genres.join(', ') : 'Select Genres' }}
                 <span class="arrow" [class.open]="genreDropdownOpen">&#9662;</span>
             </button>
@@ -19,10 +28,13 @@
                 </label>
             </div>
         </div>
+        <div class="error" *ngIf="touched.genres && !genresValid">
+            Select at least one genre.
+        </div>
 
         <div class="dropdown-container">
             <button type="button" class="dropdown-btn" (click)="toggleArtistDropdown()">
-                {{ getSelectedArtists() || 'Select Artists' }}
+                {{ getSelectedArtists() || 'Select Artists (optional)' }}
                 <span class="arrow" [class.open]="artistDropdownOpen">&#9662;</span>
             </button>
             <div class="dropdown-menu" *ngIf="artistDropdownOpen">
@@ -41,7 +53,7 @@
             </label>
         </div>
 
-        <button (click)="createAlbum()" class="create-btn">Create Album</button>
+        <button (click)="createAlbum()" class="create-btn" [disabled]="!formValid">Create Album</button>
     </div>
 
     <div class="snackbar" [class.show]="showSnackbar">{{ snackbarMessage }}</div>

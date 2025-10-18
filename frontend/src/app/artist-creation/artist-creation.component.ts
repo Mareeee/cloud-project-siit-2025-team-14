@@ -14,6 +14,8 @@ export class ArtistCreationComponent implements OnInit {
   availableGenres: string[] = [];
   dropdownOpen = false;
 
+  touched = { name: false, genres: false };
+
   showSnackbar = false;
   snackbarMessage = '';
 
@@ -22,9 +24,7 @@ export class ArtistCreationComponent implements OnInit {
     private genresService: GenresService
   ) { }
 
-  ngOnInit() {
-    this.loadGenres();
-  }
+  ngOnInit() { this.loadGenres(); }
 
   loadGenres() {
     this.genresService.getGenres().subscribe({
@@ -37,24 +37,46 @@ export class ArtistCreationComponent implements OnInit {
     });
   }
 
+  get nameValid(): boolean {
+    return !!this.newArtist.name && this.newArtist.name.trim().length >= 2;
+  }
+  get genresValid(): boolean {
+    return this.newArtist.genres.length > 0;
+  }
+  get formValid(): boolean {
+    return this.nameValid && this.genresValid;
+  }
+
   toggleGenre(genre: string) {
     const index = this.newArtist.genres.indexOf(genre);
-    if (index > -1) {
-      this.newArtist.genres.splice(index, 1);
-    } else {
-      this.newArtist.genres.push(genre);
-    }
+    if (index > -1) this.newArtist.genres.splice(index, 1);
+    else this.newArtist.genres.push(genre);
+    this.touched.genres = true;
   }
 
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
+  toggleDropdown() { this.dropdownOpen = !this.dropdownOpen; }
 
   createArtist() {
-    this.artistsService.createArtist(this.newArtist).subscribe({
+    this.touched.name = true;
+    this.touched.genres = true;
+
+    if (!this.formValid) {
+      this.triggerSnackbar('Please fill all required fields.', false);
+      return;
+    }
+
+    const payload: Artist = {
+      id: '',
+      name: this.newArtist.name.trim().replace(/\s+/g, ' '),
+      biography: this.newArtist.biography?.trim() || '',
+      genres: [...this.newArtist.genres]
+    };
+
+    this.artistsService.createArtist(payload).subscribe({
       next: () => {
         this.triggerSnackbar('Artist created successfully!', true);
         this.newArtist = { id: '', name: '', biography: '', genres: [] };
+        this.touched = { name: false, genres: false };
       },
       error: (err) => {
         this.triggerSnackbar('Error creating artist: ' + err.message, false);
@@ -70,9 +92,6 @@ export class ArtistCreationComponent implements OnInit {
     if (snackbar) {
       snackbar.style.backgroundColor = success ? '#1f27cf' : '#b00020';
     }
-
-    setTimeout(() => {
-      this.showSnackbar = false;
-    }, 3000);
+    setTimeout(() => { this.showSnackbar = false; }, 3000);
   }
 }
