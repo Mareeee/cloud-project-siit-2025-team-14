@@ -1,16 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { signIn } from 'aws-amplify/auth';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { getCurrentUser } from 'aws-amplify/auth';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   loginForm: FormGroup;
   submitted = false;
   errorMessage = '';
@@ -24,15 +23,6 @@ export class LoginComponent implements OnInit {
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
-  }
-
-  async ngOnInit() {
-    try {
-      const user = await getCurrentUser();
-      console.log('Trenutni korisnik:', user);
-    } catch {
-      console.log('Nema prijavljenog korisnika.');
-    }
   }
 
   get f() {
