@@ -1,0 +1,91 @@
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 240px;
+  background: #121212;
+  color: #b3b3b3;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  gap: 12px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  height: 100px;
+  padding: 10px 12px;
+}
+
+.logo {
+  width: auto;
+  height: 100px;
+}
+
+.brand .name {
+  color: #fff;
+  font-size: 18px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  margin: 10px 8px 6px;
+}
+
+.link {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #b3b3b3;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+
+.link:hover {
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.link.active {
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  border-left: 3px solid #1f27cf;
+}
+
+.admin .link {
+  font-weight: 600;
+}
+
+.dev-toggle {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-around;
+  gap: 6px;
+  padding: 8px 6px;
+}
+
+.dev-toggle button {
+  background: transparent;
+  color: #b3b3b3;
+  border: 1px solid rgba(255,255,255,.15);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dev-toggle button:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,.3);
+}

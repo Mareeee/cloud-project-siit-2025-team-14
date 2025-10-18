@@ -15,6 +15,7 @@ import { DiscoverComponent } from './discover/discover.component';
 import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { MatCardModule } from '@angular/material/card';
     AppRoutingModule,
     MatCheckboxModule,
     MatProgressSpinnerModule,
-    MatCardModule
+    MatCardModule,
+    SharedModule,
   ],
   providers: [
     provideClientHydration(),

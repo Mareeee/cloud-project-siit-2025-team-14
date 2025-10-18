@@ -8,9 +8,10 @@ import { DiscoverComponent } from './discover/discover.component';
 import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
 
 const routes: Routes = [
-  { path: '', component: AlbumsCreationComponent },
+  { path: '', component: DiscoverComponent },
   { path: 'content-overview', component: ContentOverviewComponent },
   { path: 'artist-create', component: ArtistCreationComponent },
+  { path: 'album-create', component: AlbumsCreationComponent },
   { path: 'music-upload', component: UploadMusicComponent },
   { path: 'discover', component: DiscoverComponent },
   { path: '**', redirectTo: '' },
