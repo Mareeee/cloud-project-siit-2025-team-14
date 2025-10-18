@@ -12,12 +12,12 @@ import { UploadMusicComponent } from './upload-music/upload-music.component';
 import { HomeComponent } from './home/home.component';
 import { ContentOverviewComponent } from './content-overview/content-overview.component';
 import { AuthModule } from './auth/auth.module';
-import { AuthInterceptor } from './auth/auth.guard';
 import { DiscoverComponent } from './discover/discover.component';
 import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { SharedModule } from './shared/shared.module';
+import { AuthInterceptor } from './auth/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -34,7 +34,7 @@ import { SharedModule } from './shared/shared.module';
     FormsModule,
     MaterialModule,
     AppRoutingModule,
-    AuthModule
+    AuthModule,
     MatCheckboxModule,
     MatProgressSpinnerModule,
     MatCardModule,
