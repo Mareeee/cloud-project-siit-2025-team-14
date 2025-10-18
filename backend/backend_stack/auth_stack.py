@@ -6,8 +6,11 @@ from aws_cdk import (
     aws_cloudfront_origins as origins,
     aws_iam as iam,
     aws_lambda as _lambda,
+    custom_resources as cr,
+    CustomResource,
     CfnOutput,
-    RemovalPolicy
+    RemovalPolicy,
+    Duration
 )
 from constructs import Construct
 
@@ -37,6 +40,8 @@ class AuthStack(Stack):
             account_recovery=cognito.AccountRecovery.NONE,
             removal_policy=RemovalPolicy.DESTROY,  # za testiranje
         )
+
+        self.user_pool = user_pool
 
         user_pool_client = user_pool.add_client(
             "UserPoolClient",
@@ -82,26 +87,22 @@ class AuthStack(Stack):
 
         CfnOutput(
             self, "CognitoUserPoolId",
-            value=user_pool.user_pool_id,
-            description="Cognito User Pool ID"
+            value=user_pool.user_pool_id
         )
 
         CfnOutput(
             self, "CognitoUserPoolClientId",
-            value=user_pool_client.user_pool_client_id,
-            description="Cognito App Client ID"
+            value=user_pool_client.user_pool_client_id
         )
 
         CfnOutput(
             self, "FrontendBucketName",
-            value=hosting_bucket.bucket_name,
-            description="Bucket name za Angular deploy"
+            value=hosting_bucket.bucket_name
         )
 
         CfnOutput(
             self, "CloudFrontURL",
-            value=f"https://{distribution.domain_name}",
-            description="URL javno dostupne aplikacije"
+            value=f"https://{distribution.domain_name}"
         )
 
         self.pre_signup_lambda = _lambda.Function(
@@ -141,3 +142,42 @@ class AuthStack(Stack):
                 resources=["*"]
             )
         )
+
+        # hardkodovanje admina
+        self.create_admin_lambda = _lambda.Function(
+            self, "CreateAdminUserLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda"),
+            handler="auth.create_admin.handler",
+            timeout=Duration.seconds(60)
+        )
+
+        self.create_admin_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "cognito-idp:AdminCreateUser",
+                    "cognito-idp:AdminSetUserPassword",
+                    "cognito-idp:AdminAddUserToGroup",
+                    "cognito-idp:AdminGetUser"
+                ],
+                resources=["*"]
+            )
+        )
+
+        provider = cr.Provider(
+            self, "CreateAdminUserProvider",
+            on_event_handler=self.create_admin_lambda
+        )
+
+        custom_resource = CustomResource(
+            self, "CreateAdminUserCustomResource",
+            service_token=provider.service_token,
+            properties={
+                "UserPoolId": user_pool.user_pool_id,
+                "AdminUsername": "admin",
+                "AdminPassword": "Admin123",
+                "AdminEmail": "admin@example.com"
+            }
+        )
+
+        custom_resource.node.add_dependency(user_pool)
