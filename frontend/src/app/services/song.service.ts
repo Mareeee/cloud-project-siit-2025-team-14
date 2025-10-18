@@ -7,7 +7,7 @@ import { Song } from '../models/song.model';
   providedIn: 'root',
 })
 export class SongsService {
-  private apiUrl = 'https://35500nafx8.execute-api.eu-central-1.amazonaws.com';
+  private apiUrl = 'https://0ms84h98gd.execute-api.eu-central-1.amazonaws.com';
   private stagePath = '/dev';
   private resourcePath = '/songs';
   private url = this.apiUrl + this.stagePath + this.resourcePath;

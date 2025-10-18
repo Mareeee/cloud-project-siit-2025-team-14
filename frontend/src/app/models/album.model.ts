@@ -1,6 +1,6 @@
 export interface Album {
     id: string;
-    name: string;
-    releaseDate: Date,
-    genres: string[]
+    title: string;
+    releaseDate: string;
+    genres: string[];
 }

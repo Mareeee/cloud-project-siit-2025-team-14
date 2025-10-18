@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Artist } from '../models/artist.model';
 
 @Injectable({
     providedIn: 'root',
@@ -13,15 +14,15 @@ export class ArtistsService {
 
     constructor(private http: HttpClient) { }
 
-    createArtist(artist: { name: string; biography: string; genres: string[] }): Observable<any> {
-        return this.http.post<any>(this.url, artist);
+    createArtist(artist: Omit<Artist, 'id'>): Observable<{ message: string; id: string }> {
+        return this.http.post<{ message: string; id: string }>(this.url, artist);
     }
 
-    getArtists(): Observable<{ data: any[] }> {
-        return this.http.get<{ data: any[] }>(this.url);
+    getArtists(): Observable<{ data: Artist[] }> {
+        return this.http.get<{ data: Artist[] }>(this.url);
     }
 
-    getArtistsByGenre(genre: string): Observable<{ data: any[] }> {
-        return this.http.get<{ data: any[] }>(`${this.url}/genre/${encodeURIComponent(genre)}`);
+    getArtistsByGenre(genre: string): Observable<{ data: Artist[] }> {
+        return this.http.get<{ data: Artist[] }>(`${this.url}/genre/${encodeURIComponent(genre)}`);
     }
 }

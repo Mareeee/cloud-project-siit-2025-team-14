@@ -6,11 +6,15 @@ import { ArtistCreationComponent } from './artist-creation/artist-creation.compo
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { FormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MaterialModule } from './material/material.module';
 import { UploadMusicComponent } from './upload-music/upload-music.component';
 import { HomeComponent } from './home/home.component';
 import { ContentOverviewComponent } from './content-overview/content-overview.component';
 import { DiscoverComponent } from './discover/discover.component';
+import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -19,13 +23,17 @@ import { DiscoverComponent } from './discover/discover.component';
     ContentOverviewComponent,
     ArtistCreationComponent,
     HomeComponent,
-    DiscoverComponent
+    DiscoverComponent,
+    AlbumsCreationComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     MaterialModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatCardModule
   ],
   providers: [
     provideClientHydration(),

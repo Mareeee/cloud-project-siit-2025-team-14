@@ -223,3 +223,25 @@ audio {
   background-color: #ff6b6b;
   transform: scale(1.1);
 }
+
+.light-spinner ::ng-deep circle {
+  stroke: #ffffff !important;
+}
+
+.light-checkbox.mat-mdc-checkbox .mdc-checkbox__background {
+  border-color: #ffffff !important;
+}
+
+.light-checkbox.mat-mdc-checkbox.mat-accent .mdc-checkbox__native-control:checked + .mdc-checkbox__background,
+.light-checkbox.mat-mdc-checkbox.mat-accent.mdc-checkbox--selected .mdc-checkbox__background {
+  background-color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.light-checkbox label {
+  color: #ffffff !important;
+}
+
+::ng-deep .light-checkbox .mdc-form-field label {
+  color: #ffffff !important;
+}
