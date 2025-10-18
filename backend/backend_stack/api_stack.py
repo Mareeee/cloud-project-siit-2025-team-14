@@ -32,6 +32,18 @@ class ApiStack(Stack):
             )
         )
 
+        # user_pool = cognito.UserPool.from_user_pool_id(
+        #     self, "UserPool", "<OVDE UBACI UserPoolId>"
+        # )
+
+        # authorizer = apigw.CognitoUserPoolsAuthorizer(
+        #     self, "ApiAuthorizer",
+        #     cognito_user_pools=[user_pool]
+        # )
+
+        # authorization_type=apigw.AuthorizationType.COGNITO,
+        # authorizer=authorizer
+
         songs_res = api.root.add_resource("songs")
         songs_res.add_method("GET", apigw.LambdaIntegration(songs_stack.get_songs_lambda))
         songs_res.add_method("PUT", apigw.LambdaIntegration(songs_stack.create_song_lambda))
