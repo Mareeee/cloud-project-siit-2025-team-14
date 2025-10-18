@@ -13,15 +13,16 @@
 
 .brand {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  letter-spacing: .3px;
+  width: auto;
+  height: 100px;
+  padding: 10px 12px;
 }
 
-.brand .logo {
+.logo {
   width: auto;
-  height: 35px;
+  height: 100px;
 }
 
 .brand .name {

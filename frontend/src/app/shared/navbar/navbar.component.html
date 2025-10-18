@@ -1,15 +1,15 @@
 <nav class="sidebar">
     <div class="brand">
         <img class="logo" src="../../../assets/zvezde_granda.png" alt="logo" />
-        <span class="name">Zvezde Granda</span>
     </div>
 
-    <div class="section" *ngIf="(role$|async) === 'guest'">
+    <div class="section">
         <a class="link" href="#" title="Sign in">Sign in</a>
         <a class="link" href="#" title="Register">Register</a>
+        <a class="link" href="#" title="Sign out">Sign out</a>
     </div>
 
-    <div class="section" *ngIf="(role$|async) !== 'guest'">
+    <div class="section">
         <a class="link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Feed</a>
 
         <a class="link" routerLink="/discover" routerLinkActive="active">Discover</a>
@@ -23,7 +23,7 @@
         <a class="link" routerLink="/content-overview" routerLinkActive="active">Browse</a>
     </div>
 
-    <div class="section admin" *ngIf="(role$|async) === 'admin'">
+    <div class="section admin">
         <div class="section-label">Admin</div>
         <a class="link" routerLink="/artist-create" routerLinkActive="active">
             Artists
@@ -34,11 +34,5 @@
         <a class="link" routerLink="/content-overview" routerLinkActive="active">
             Manage Content
         </a>
-    </div>
-
-    <div class="dev-toggle">
-        <button (click)="devSwitch('guest')">Guest</button>
-        <button (click)="devSwitch('user')">User</button>
-        <button (click)="devSwitch('admin')">Admin</button>
     </div>
 </nav>
