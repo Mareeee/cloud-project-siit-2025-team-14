@@ -9,7 +9,7 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'content-overview', component: ContentOverviewComponent },
   { path: 'artist-create', component: ArtistCreationComponent },
-  { path: 'music-upload', component: UploadMusicComponent},
+  { path: 'music-upload', component: UploadMusicComponent },
   { path: '**', redirectTo: '' },
 ];
 
