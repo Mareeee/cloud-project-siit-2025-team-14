@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_cloudfront as cloudfront,
     aws_cloudfront_origins as origins,
     aws_iam as iam,
+    aws_lambda as _lambda,
     CfnOutput,
     RemovalPolicy
 )
@@ -18,8 +19,8 @@ class AuthStack(Stack):
             self, "UserPool",
             user_pool_name="UserPoolApp",
             self_sign_up_enabled=True,
-            sign_in_aliases=cognito.SignInAliases(username=True, email=True),
-            auto_verify=cognito.AutoVerifiedAttrs(email=True),
+            sign_in_aliases=cognito.SignInAliases(username=True, email=False),
+            auto_verify=cognito.AutoVerifiedAttrs(email=False, phone=False),
             standard_attributes=cognito.StandardAttributes(
                 given_name=cognito.StandardAttribute(required=True, mutable=True),
                 family_name=cognito.StandardAttribute(required=True, mutable=True),
@@ -33,7 +34,8 @@ class AuthStack(Stack):
                 require_digits=True,
                 require_symbols=False
             ),
-            account_recovery=cognito.AccountRecovery.EMAIL_ONLY
+            account_recovery=cognito.AccountRecovery.NONE,
+            removal_policy=RemovalPolicy.DESTROY,  # za testiranje
         )
 
         user_pool_client = user_pool.add_client(
@@ -45,6 +47,18 @@ class AuthStack(Stack):
                 user_srp=True
             ),
             prevent_user_existence_errors=True
+        )
+
+        admin_group = cognito.CfnUserPoolGroup(
+            self, "AdminGroup",
+            group_name="Admin",
+            user_pool_id=user_pool.user_pool_id
+        )
+
+        user_group = cognito.CfnUserPoolGroup(
+            self, "UserGroup",
+            group_name="User",
+            user_pool_id=user_pool.user_pool_id
         )
 
         hosting_bucket = s3.Bucket(
@@ -88,4 +102,42 @@ class AuthStack(Stack):
             self, "CloudFrontURL",
             value=f"https://{distribution.domain_name}",
             description="URL javno dostupne aplikacije"
+        )
+
+        self.pre_signup_lambda = _lambda.Function(
+            self, "PreSignUpLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda"),
+            handler="auth.pre_signup.handler"
+        )
+
+        self.pre_signup_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["cognito-idp:ListUsers"],
+                resources=["*"]
+            )
+        )
+
+        user_pool.add_trigger(
+            cognito.UserPoolOperation.PRE_SIGN_UP,
+            self.pre_signup_lambda
+        )
+
+        self.post_registration_lambda = _lambda.Function(
+            self, 'PostRegistrationLambda',
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='auth.post_registration.handler'
+        )
+
+        user_pool.add_trigger(
+            cognito.UserPoolOperation.POST_CONFIRMATION,
+            self.post_registration_lambda
+        )
+
+        self.post_registration_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["cognito-idp:AdminAddUserToGroup"],
+                resources=["*"]
+            )
         )

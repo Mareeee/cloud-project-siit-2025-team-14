@@ -4,6 +4,8 @@ import { ContentOverviewComponent } from './content-overview/content-overview.co
 import { HomeComponent } from './home/home.component';
 import { ArtistCreationComponent } from './artist-creation/artist-creation.component';
 import { UploadMusicComponent } from './upload-music/upload-music.component';
+import { LoginComponent } from './auth/login/login.component';
+import { RegistrationComponent } from './auth/registration/registration.component';
 import { DiscoverComponent } from './discover/discover.component';
 import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
 
@@ -11,6 +13,9 @@ const routes: Routes = [
   { path: '', component: DiscoverComponent },
   { path: 'content-overview', component: ContentOverviewComponent },
   { path: 'artist-create', component: ArtistCreationComponent },
+  { path: 'music-upload', component: UploadMusicComponent},
+  { path: 'login', component: LoginComponent},
+  { path: 'register', component: RegistrationComponent},
   { path: 'album-create', component: AlbumsCreationComponent },
   { path: 'music-upload', component: UploadMusicComponent },
   { path: 'discover', component: DiscoverComponent },
