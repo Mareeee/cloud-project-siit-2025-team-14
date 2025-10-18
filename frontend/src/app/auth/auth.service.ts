@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Hub } from 'aws-amplify/utils';
 import { signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,8 @@ import { signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 export class AuthService {
   private user: any = null;
   private token: string | null = null;
+  isLoggedIn$ = new BehaviorSubject<boolean>(false);
+  userRole$ = new BehaviorSubject<string | null>(null);
 
   constructor() {
     Hub.listen('auth', (data) => {
@@ -28,20 +31,23 @@ export class AuthService {
       const user = await getCurrentUser();
       const session = await fetchAuthSession();
       const idToken = session.tokens?.idToken?.toString();
-      const accessToken = session.tokens?.accessToken?.toString();
 
       this.user = user;
-      this.token = accessToken || idToken || null;
+      this.token = idToken || null;
 
       if (this.token) {
         localStorage.setItem('token', this.token);
       }
 
+      const role = await this.getUserRole();
+      this.isLoggedIn$.next(true);
+      this.userRole$.next(role);
+
       console.log('Ulogovani korisnik:', user);
     } catch {
       this.clearSession();
     }
-  }
+    }
 
   async getUser() {
     if (!this.user) await this.loadUser();
@@ -85,5 +91,7 @@ export class AuthService {
     this.user = null;
     this.token = null;
     localStorage.removeItem('token');
+    this.isLoggedIn$.next(false);
+    this.userRole$.next(null);
   }
 }

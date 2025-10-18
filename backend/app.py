@@ -12,6 +12,7 @@ from backend_stack.ratings_stack import RatingsStack
 from backend_stack.subscriptions_stack import SubscriptionsStack
 from backend_stack.transcription_stack import TranscriptionStack
 from backend_stack.seeder_stack import SeederStack
+from backend_stack.auth_stack import AuthStack
 
 app = cdk.App()
 
@@ -36,6 +37,7 @@ ApiStack(app, "ApiStack",
           subscriptions_stack=subscriptions_stack,
           notifications_stack=notifications_stack,
           transcription_stack=transcription_stack,
-          genres_stack=genres_stack)
+          genres_stack=genres_stack,
+          auth_stack=auth_stack)
 
 app.synth()
