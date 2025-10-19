@@ -1,7 +1,8 @@
 from constructs import Construct
 from aws_cdk import (
     Stack,
-    aws_apigateway as apigw
+    aws_apigateway as apigw,
+    aws_cognito as cognito,
 )
 
 class ApiStack(Stack):
@@ -18,6 +19,7 @@ class ApiStack(Stack):
         transcription_stack,
         genres_stack,
         genre_catalog_stack,
+        auth_stack,
         **kwargs
     ):
         super().__init__(scope, construct_id, **kwargs)
@@ -32,6 +34,16 @@ class ApiStack(Stack):
                 allow_methods=["GET", "OPTIONS", "PUT", "POST", "DELETE"],
                 allow_headers=["Content-Type", "Authorization"],
             )
+        )
+
+        user_pool = cognito.UserPool.from_user_pool_id(
+            self, "ImportedUserPool",
+            user_pool_id=auth_stack.user_pool.user_pool_id
+        )
+
+        authorizer = apigw.CognitoUserPoolsAuthorizer(
+            self, "ApiAuthorizer",
+            cognito_user_pools=[user_pool]
         )
 
         songs_res = api.root.add_resource("songs")
@@ -55,7 +67,10 @@ class ApiStack(Stack):
 
         artists_res = api.root.add_resource("artists")
         artists_res.add_method("GET", apigw.LambdaIntegration(artists_stack.get_artists_lambda))
-        artists_res.add_method("POST", apigw.LambdaIntegration(artists_stack.create_artist_lambda))
+        artists_res.add_method(
+            "POST", apigw.LambdaIntegration(artists_stack.create_artist_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer)
 
         albums_res = api.root.add_resource("albums")
         albums_res.add_method("GET", apigw.LambdaIntegration(albums_stack.get_albums_lambda))

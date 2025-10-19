@@ -39,6 +39,7 @@ ApiStack(app, "ApiStack",
           notifications_stack=notifications_stack,
           transcription_stack=transcription_stack,
           genres_stack=genres_stack,
-          genre_catalog_stack=genre_catalog_stack)
+          genre_catalog_stack=genre_catalog_stack,
+          auth_stack=auth_stack)
 
 app.synth()

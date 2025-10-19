@@ -1,0 +1,101 @@
+:host {
+    display: block;
+    --bg: #121212;
+    --border: rgba(255, 255, 255, .10);
+    --text: #eaeaea;
+    --muted: #b3b3b3;
+    --accent: #1f27cf;
+    --danger: #de4e3e;
+}
+
+.confirm-card {
+    width: min(520px, 92vw);
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 18px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .45);
+}
+
+.cd-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.cd-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
+.cd-icon.warn {
+    background: rgba(221, 80, 65, .16);
+    color: #ff6b6b;
+}
+
+h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    color: #fff;
+}
+
+.cd-msg {
+    margin: 10px 4px 16px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, transform .06s, color .2s;
+}
+
+.btn:hover {
+    background: #202020;
+    border-color: rgba(255, 255, 255, .24);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn.ghost {
+    background: transparent;
+    color: var(--muted);
+}
+
+.btn.ghost:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, .28);
+}
+
+.btn.danger {
+    background: rgba(221, 80, 65, .12);
+    border-color: rgba(221, 80, 65, .35);
+    color: #ff6b6b;
+    font-weight: 700;
+}
+
+.btn.danger:hover {
+    background: rgba(221, 80, 65, .18);
+    color: #fff;
+}
