@@ -116,3 +116,11 @@
   width: 70px;
   text-align: right;
 }
+
+.no-data-text,
+.no-data-container {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  margin-top: 20px;
+}

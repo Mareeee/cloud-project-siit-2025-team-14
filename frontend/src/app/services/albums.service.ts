@@ -7,7 +7,7 @@ import { Album } from '../models/album.model';
     providedIn: 'root'
 })
 export class AlbumsService {
-    private apiUrl = 'https://0ms84h98gd.execute-api.eu-central-1.amazonaws.com';
+    private apiUrl = 'https://jbm2i4anqh.execute-api.eu-central-1.amazonaws.com';
     private stagePath = '/dev';
     private resourcePath = '/albums';
     private url = this.apiUrl + this.stagePath + this.resourcePath;

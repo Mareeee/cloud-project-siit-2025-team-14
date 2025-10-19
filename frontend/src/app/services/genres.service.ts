@@ -7,7 +7,7 @@ import { Genre } from '../models/genre.model';
     providedIn: 'root'
 })
 export class GenresService {
-    private apiUrl = 'https://0ms84h98gd.execute-api.eu-central-1.amazonaws.com';
+    private apiUrl = 'https://jbm2i4anqh.execute-api.eu-central-1.amazonaws.com';
     private stagePath = '/dev';
     private resourcePath = '/genres';
     private url = this.apiUrl + this.stagePath + this.resourcePath;
@@ -16,5 +16,10 @@ export class GenresService {
 
     getGenres(): Observable<{ data: Genre[] }> {
         return this.http.get<{ data: Genre[] }>(this.url);
+    }
+
+    getEntitiesByGenre(genre: string): Observable<{ data: any[] }> {
+        const discoverUrl = `${this.apiUrl}${this.stagePath}/discover/${encodeURIComponent(genre)}`;
+        return this.http.get<{ data: any[] }>(discoverUrl);
     }
 }

@@ -1,5 +1,5 @@
-<div *ngIf="songs.length > 0" class="songs-container">
-    <h2>All Songs</h2>
+<div *ngIf="songs.length > 0; else noSongs" class="songs-container">
+    <h2>{{ title }}</h2>
     <div class="songs-grid">
         <div *ngFor="let song of songs" class="song-card">
             <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
@@ -14,7 +14,7 @@
                     Genres: {{ song.genres!.join(', ') }}
                 </p>
                 <p class="song-date">Released: {{ song.creationDate | date:'mediumDate' }}</p>
-                <div class="song-spacer"></div>
+
                 <div class="audio-player-wrapper">
                     <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata(song, $event)"
                         (timeupdate)="onTimeUpdate(song, $event)">
@@ -35,3 +35,9 @@
         </div>
     </div>
 </div>
+
+<ng-template #noSongs>
+    <div class="no-data-container">
+        <h3>No songs available for this artist or album.</h3>
+    </div>
+</ng-template>

@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { SongsService } from '../services/song.service';
-import { ArtistsService } from '../services/artist.service';
-import { AlbumsService } from '../services/albums.service';
 import { GenresService } from '../services/genres.service';
-import { Song } from '../models/song.model';
-import { Artist } from '../models/artist.model';
-import { Album } from '../models/album.model';
 import { Genre } from '../models/genre.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { DiscoverArtist, DiscoverAlbum, DiscoverSong } from '../models/discover.models';
 
 @Component({
   selector: 'app-discover',
@@ -18,9 +14,9 @@ export class DiscoverComponent implements OnInit {
   availableGenres: string[] = [];
   selectedGenre: string | null = null;
 
-  artists: Artist[] = [];
-  albums: Album[] = [];
-  songs: Song[] = [];
+  artists: DiscoverArtist[] = [];
+  albums: DiscoverAlbum[] = [];
+  songs: DiscoverSong[] = [];
 
   songSectionTitle = '';
   activeAudio: HTMLAudioElement | null = null;
@@ -28,11 +24,9 @@ export class DiscoverComponent implements OnInit {
   isLoading = false;
 
   constructor(
-    private songsService: SongsService,
-    private artistsService: ArtistsService,
-    private albumsService: AlbumsService,
     private genresService: GenresService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -63,76 +57,39 @@ export class DiscoverComponent implements OnInit {
     this.songSectionTitle = `Songs in ${this.selectedGenre}`;
     this.isLoading = true;
 
-    this.artistsService.getArtistsByGenre(this.selectedGenre).subscribe({
-      next: (res) => (this.artists = res.data || []),
-      error: () => this.snackBar.open('Failed to load artists.', 'Close', { duration: 3000 })
-    });
-
-    this.albumsService.getAlbumsByGenre(this.selectedGenre).subscribe({
-      next: (res) => (this.albums = res.data || []),
-      error: () => this.snackBar.open('Failed to load albums.', 'Close', { duration: 3000 })
-    });
-
-    this.songsService.getSongsByGenre(this.selectedGenre).subscribe({
+    this.genresService.getEntitiesByGenre(this.selectedGenre).subscribe({
       next: (res) => {
-        this.songs = (res.data || []).map((s: any) => ({
-          ...s,
-          isPlaying: false,
-          currentTime: 0,
-          duration: 0
-        }));
+        const data = res.data || [];
+
+        this.artists = data.filter((item: any) => item.entityType === 'ARTIST');
+        this.albums = data.filter((item: any) => item.entityType === 'ALBUM');
+        this.songs = data
+          .filter((item: any) => item.entityType === 'SONG')
+          .map((s: DiscoverSong) => ({
+            ...s,
+            isPlaying: false,
+            currentTime: 0,
+            duration: 0
+          }));
+
         this.isLoading = false;
       },
       error: () => {
         this.isLoading = false;
-        this.snackBar.open('Failed to load songs.', 'Close', { duration: 3000 });
+        this.snackBar.open('Failed to load data by genre.', 'Close', { duration: 3000 });
       }
     });
   }
 
   showArtistSongs(artistId: string) {
-    this.songSectionTitle = 'Songs by selected artist';
-    this.isLoading = true;
-
-    this.songsService.getSongsByArtist(artistId).subscribe({
-      next: (res) => {
-        this.songs = (res.data || []).map((s: any) => ({
-          ...s,
-          isPlaying: false,
-          currentTime: 0,
-          duration: 0
-        }));
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.snackBar.open('Failed to load artist songs.', 'Close', { duration: 3000 });
-      }
-    });
+    this.router.navigate(['/content-overview'], { queryParams: { artistId } });
   }
 
   showAlbumSongs(albumId: string) {
-    this.songSectionTitle = 'Songs from selected album';
-    this.isLoading = true;
-
-    this.songsService.getSongsByAlbum(albumId).subscribe({
-      next: (res) => {
-        this.songs = (res.data || []).map((s: any) => ({
-          ...s,
-          isPlaying: false,
-          currentTime: 0,
-          duration: 0
-        }));
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.snackBar.open('Failed to load album songs.', 'Close', { duration: 3000 });
-      }
-    });
+    this.router.navigate(['/content-overview'], { queryParams: { albumId } });
   }
 
-  togglePlay(song: Song, audio: HTMLAudioElement) {
+  togglePlay(song: DiscoverSong, audio: HTMLAudioElement) {
     if (this.activeAudio && this.activeAudio !== audio) {
       this.activeAudio.pause();
       const prev = this.songs.find(s => s.audioUrl === this.activeAudio?.src);
@@ -150,15 +107,15 @@ export class DiscoverComponent implements OnInit {
     }
   }
 
-  seek(song: any, audio: HTMLAudioElement) {
-    audio.currentTime = song.currentTime;
+  seek(song: DiscoverSong, audio: HTMLAudioElement) {
+    audio.currentTime = song.currentTime!;
   }
 
-  onLoadedMetadata(song: any, event: any) {
+  onLoadedMetadata(song: DiscoverSong, event: any) {
     song.duration = event.target.duration;
   }
 
-  onTimeUpdate(song: any, event: any) {
+  onTimeUpdate(song: DiscoverSong, event: any) {
     song.currentTime = event.target.currentTime;
   }
 
