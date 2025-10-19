@@ -2,7 +2,7 @@ import os
 import json
 import uuid
 import boto3
-from ratings.utils.utils import create_response
+from utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["RATINGS_TABLE"])

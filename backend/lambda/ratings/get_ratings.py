@@ -1,7 +1,7 @@
 import os
 import boto3
 from boto3.dynamodb.conditions import Key
-from ratings.utils.utils import create_response
+from utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["RATINGS_TABLE"])

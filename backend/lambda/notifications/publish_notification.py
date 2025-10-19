@@ -1,7 +1,7 @@
 import os
 import json
 import boto3
-from notifications.utils.utils import create_response
+from utils.utils import create_response
 
 sns = boto3.client("sns")
 TOPIC_ARN = os.environ["TOPIC_ARN"]

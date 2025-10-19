@@ -1,6 +1,6 @@
 import os
 import boto3
-from genres.utils.utils import create_response
+from utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])

@@ -1,5 +1,5 @@
 import json
-from transcription.utils.utils import create_response
+from utils.utils import create_response
 
 def handler(event, context):
     try:

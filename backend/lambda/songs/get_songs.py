@@ -1,6 +1,6 @@
 import os
 import boto3
-from songs.utils.utils import create_response
+from utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])

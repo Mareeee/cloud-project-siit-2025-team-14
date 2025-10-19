@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import { Song } from '../models/song.model';
+import { environment } from '../../env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SongsService {
-  private apiUrl = 'https://jbm2i4anqh.execute-api.eu-central-1.amazonaws.com';
   private stagePath = '/dev';
   private resourcePath = '/songs';
-  private url = this.apiUrl + this.stagePath + this.resourcePath;
+  private url = environment.apiBaseUrl + this.stagePath + this.resourcePath;
 
   constructor(private http: HttpClient) { }
 

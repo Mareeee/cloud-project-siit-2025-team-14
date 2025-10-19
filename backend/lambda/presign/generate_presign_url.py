@@ -1,7 +1,7 @@
 import os
 import json
 import boto3
-from presign.utils.utils import create_response
+from utils.utils import create_response
 
 s3 = boto3.client("s3")
 bucket = os.environ["MEDIA_BUCKET"]

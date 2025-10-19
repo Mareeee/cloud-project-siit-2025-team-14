@@ -1,6 +1,6 @@
 import os
 import boto3
-from artists.utils.utils import create_response
+from utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
 artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])

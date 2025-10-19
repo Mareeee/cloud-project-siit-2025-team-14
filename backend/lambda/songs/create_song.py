@@ -4,7 +4,7 @@ import uuid
 import json
 from datetime import datetime
 from boto3.dynamodb.conditions import Key
-from songs.utils.utils import create_response
+from utils.utils import create_response
 
 s3 = boto3.client("s3")
 bucket = os.environ["MEDIA_BUCKET"]
