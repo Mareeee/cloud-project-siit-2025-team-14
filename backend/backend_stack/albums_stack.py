@@ -7,7 +7,7 @@ from aws_cdk import (
 )
 
 class AlbumsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, genres_table, artists_table, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, genres_table, artists_table, genre_catalog_table, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.albums_table = dynamodb.Table(
@@ -27,7 +27,8 @@ class AlbumsStack(Stack):
             environment={
                 "ALBUMS_TABLE": self.albums_table.table_name,
                 "GENRES_TABLE": genres_table.table_name,
-                "ARTISTS_TABLE": artists_table.table_name
+                "ARTISTS_TABLE": artists_table.table_name,
+                "GENRE_CATALOG_TABLE": genre_catalog_table.table_name
             }
         )
 
@@ -42,23 +43,12 @@ class AlbumsStack(Stack):
             }
         )
 
-        self.get_albums_by_genre_lambda = _lambda.Function(
-            self, 'GetAlbumsByGenreLambda',
-            runtime=_lambda.Runtime.PYTHON_3_9,
-            code=_lambda.Code.from_asset('lambda'),
-            handler='albums.get_albums_by_genre.handler',
-            environment={
-                "ALBUMS_TABLE": self.albums_table.table_name,
-                "GENRES_TABLE": genres_table.table_name
-            }
-        )
-
         self.albums_table.grant_read_write_data(self.create_album_lambda)
         self.albums_table.grant_read_write_data(self.get_albums_lambda)
-        self.albums_table.grant_read_data(self.get_albums_by_genre_lambda)
 
         genres_table.grant_read_write_data(self.create_album_lambda)
         genres_table.grant_read_data(self.get_albums_lambda)
-        genres_table.grant_read_data(self.get_albums_by_genre_lambda)
 
         artists_table.grant_read_data(self.create_album_lambda)
+        
+        genre_catalog_table.grant_read_write_data(self.create_album_lambda)

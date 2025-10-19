@@ -1,9 +1,10 @@
 import os
 import boto3
+from boto3.dynamodb.conditions import Key
 from songs.utils.utils import create_response
 
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table(os.environ["SONGS_TABLE"])
+artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
 s3 = boto3.client("s3")
 bucket_name = os.environ["MEDIA_BUCKET"]
 
@@ -13,32 +14,22 @@ def handler(event, context):
         if not artist_id:
             return create_response(400, {"message": "Artist ID required."})
 
-        response = table.scan(
-            FilterExpression="contains(artistIds, :aid)",
-            ExpressionAttributeValues={":aid": artist_id}
+        response = artist_catalog_table.query(
+            KeyConditionExpression=Key("PK").eq(f"ARTIST#{artist_id}")
         )
 
         songs = response.get("Items", [])
         for song in songs:
-            genres = song.get("genres", [])
-            if isinstance(genres, set):
-                song["genres"] = list(genres)
-            elif not isinstance(genres, list):
-                song["genres"] = [str(genres)]
-
-            audio_key = song.get("s3KeyAudio")
-            if audio_key:
+            if song.get("s3KeyAudio"):
                 song["audioUrl"] = s3.generate_presigned_url(
                     "get_object",
-                    Params={"Bucket": bucket_name, "Key": audio_key},
+                    Params={"Bucket": bucket_name, "Key": song["s3KeyAudio"]},
                     ExpiresIn=600
                 )
-
-            cover_key = song.get("s3KeyCover")
-            if cover_key:
+            if song.get("s3KeyCover"):
                 song["imageUrl"] = s3.generate_presigned_url(
                     "get_object",
-                    Params={"Bucket": bucket_name, "Key": cover_key},
+                    Params={"Bucket": bucket_name, "Key": song["s3KeyCover"]},
                     ExpiresIn=600
                 )
 

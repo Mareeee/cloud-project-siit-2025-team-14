@@ -12,14 +12,16 @@ from backend_stack.ratings_stack import RatingsStack
 from backend_stack.subscriptions_stack import SubscriptionsStack
 from backend_stack.transcription_stack import TranscriptionStack
 from backend_stack.seeder_stack import SeederStack
+from backend_stack.genre_catalog_stack import GenreCatalogStack
 
 app = cdk.App()
 
 genres_stack = GenresStack(app, "GenresStack")
+genre_catalog_stack = GenreCatalogStack(app, "GenreCatalogStack")
 
-artists_stack = ArtistsStack(app, "ArtistsStack", genres_table=genres_stack.genres_table)
-albums_stack = AlbumsStack(app, "AlbumsStack", genres_table=genres_stack.genres_table, artists_table=artists_stack.artists_table)
-songs_stack = SongsStack(app, "SongsStack", genres_table=genres_stack.genres_table)
+songs_stack = SongsStack(app, "SongsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table)
+artists_stack = ArtistsStack(app, "ArtistsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table)
+albums_stack = AlbumsStack(app, "AlbumsStack", genres_table=genres_stack.genres_table, artists_table=artists_stack.artists_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table)
 
 auth_stack = AuthStack(app, "AuthStack")
 notifications_stack = NotificationsStack(app, "NotificationsStack")
@@ -36,6 +38,7 @@ ApiStack(app, "ApiStack",
           subscriptions_stack=subscriptions_stack,
           notifications_stack=notifications_stack,
           transcription_stack=transcription_stack,
-          genres_stack=genres_stack)
+          genres_stack=genres_stack,
+          genre_catalog_stack=genre_catalog_stack)
 
 app.synth()

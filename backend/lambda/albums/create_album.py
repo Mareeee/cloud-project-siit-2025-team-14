@@ -2,28 +2,27 @@ import uuid
 import json
 import os
 import boto3
+from boto3.dynamodb.conditions import Key
 from songs.utils.utils import create_response
-from boto3.dynamodb.conditions import Attr, Key
 
 dynamodb = boto3.resource("dynamodb")
 albums_table = dynamodb.Table(os.environ["ALBUMS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])
+genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 
 def get_or_create_genre(genre_name):
-    response = genres_table.scan(
-        FilterExpression=Attr("name").eq(genre_name)
+    response = genres_table.query(
+        IndexName="GenreNameIndex",
+        KeyConditionExpression=Key("name").eq(genre_name)
     )
     items = response.get("Items", [])
     if items:
-        return items[0]["id"]
+        return {"id": items[0]["id"], "name": items[0]["name"]}
 
     genre_id = str(uuid.uuid4())
-    genres_table.put_item(Item={
-        "id": genre_id,
-        "name": genre_name
-    })
-    return genre_id
+    genres_table.put_item(Item={"id": genre_id, "name": genre_name})
+    return {"id": genre_id, "name": genre_name}
 
 def handler(event, context):
     try:
@@ -37,15 +36,13 @@ def handler(event, context):
             return create_response(400, {"message": "title, releaseDate and genres are required"})
 
         album_id = str(uuid.uuid4())
-        genre_ids = [get_or_create_genre(g) for g in genres]
+        genre_data = [get_or_create_genre(g) for g in genres]
+        genre_ids = [g["id"] for g in genre_data]
 
         valid_artist_ids = []
         for aid in artist_ids:
-            res = artists_table.query(
-                KeyConditionExpression=Key("id").eq(aid)
-            )
-            items = res.get("Items", [])
-            if items:
+            res = artists_table.query(KeyConditionExpression=Key("id").eq(aid))
+            if res.get("Items"):
                 valid_artist_ids.append(aid)
 
         item = {
@@ -57,6 +54,16 @@ def handler(event, context):
         }
 
         albums_table.put_item(Item=item)
+
+        for g in genre_data:
+            genre_catalog_table.put_item(Item={
+                "PK": f"GENRE#{g['name']}",
+                "SK": f"ALBUM#{album_id}",
+                "entityType": "ALBUM",
+                "entityId": album_id,
+                "title": title,
+                "releaseDate": release_date
+            })
 
         return create_response(200, {
             "message": f'Album "{title}" created successfully.',
