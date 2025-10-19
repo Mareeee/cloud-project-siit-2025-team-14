@@ -43,11 +43,10 @@ export class AuthService {
       this.isLoggedIn$.next(true);
       this.userRole$.next(role);
 
-      console.log('Ulogovani korisnik:', user);
     } catch {
       this.clearSession();
     }
-    }
+  }
 
   async getUser() {
     if (!this.user) await this.loadUser();

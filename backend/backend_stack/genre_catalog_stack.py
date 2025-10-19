@@ -3,7 +3,8 @@ from aws_cdk import (
     Stack,
     RemovalPolicy,
     aws_lambda as _lambda,
-    aws_dynamodb as dynamodb
+    aws_dynamodb as dynamodb,
+    aws_s3 as s3
 )
 
 class GenreCatalogStack(Stack):
@@ -31,7 +32,12 @@ class GenreCatalogStack(Stack):
             code=_lambda.Code.from_asset("lambda"),
             handler="genre_catalog.get_entities_by_genre.handler",
             environment={
-                "GENRE_CATALOG_TABLE": self.genre_catalog_table.table_name
+                "GENRE_CATALOG_TABLE": self.genre_catalog_table.table_name,
+                "MEDIA_BUCKET_NAME": "songs-media",
             }
         )
+
+        media_bucket = s3.Bucket.from_bucket_name(self, "SongsMediaImported", "songs-media")
+        
+        media_bucket.grant_read(self.get_entities_by_genre_lambda)
         self.genre_catalog_table.grant_read_data(self.get_entities_by_genre_lambda)

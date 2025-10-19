@@ -116,6 +116,8 @@ class SongsStack(Stack):
         self.songs_table.grant_read_data(self.get_songs_by_album_lambda)
         self.media_bucket.grant_read_write(self.create_song_lambda)
         self.media_bucket.grant_read_write(self.get_songs_lambda)
+        self.media_bucket.grant_read_write(self.get_songs_by_artist_lambda)
+        self.media_bucket.grant_read_write(self.get_songs_by_album_lambda)
         self.media_bucket.grant_put(self.presign_lambda)
 
         genres_table.grant_read_write_data(self.create_song_lambda)
