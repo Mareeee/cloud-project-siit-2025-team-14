@@ -8,7 +8,7 @@ from aws_cdk import (
 )
 
 class SongsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, genres_table, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, genres_table, genre_catalog_table, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.songs_table = dynamodb.Table(
@@ -16,6 +16,24 @@ class SongsStack(Stack):
             table_name="SongsTable",
             partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="title", type=dynamodb.AttributeType.STRING),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=RemovalPolicy.DESTROY
+        )
+
+        self.songs_table.add_global_secondary_index(
+            index_name="AlbumIndex",
+            partition_key=dynamodb.Attribute(
+                name="album_id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            projection_type=dynamodb.ProjectionType.ALL
+        )
+
+        self.artist_catalog_table = dynamodb.Table(
+            self, "ArtistCatalogTable",
+            table_name="ArtistCatalogTable",
+            partition_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY
         )
@@ -53,18 +71,9 @@ class SongsStack(Stack):
             environment={
                 "SONGS_TABLE": self.songs_table.table_name,
                 "MEDIA_BUCKET": self.media_bucket.bucket_name,
-                "GENRES_TABLE": genres_table.table_name
-            }
-        )
-
-        self.get_songs_by_genre_lambda = _lambda.Function(
-            self, 'GetSongsByGenreLambda',
-            runtime=_lambda.Runtime.PYTHON_3_9,
-            code=_lambda.Code.from_asset('lambda'),
-            handler='songs.get_songs_by_genre.handler',
-            environment={
-                "SONGS_TABLE": self.songs_table.table_name,
-                "MEDIA_BUCKET": self.media_bucket.bucket_name
+                "GENRES_TABLE": genres_table.table_name,
+                "GENRE_CATALOG_TABLE": genre_catalog_table.table_name,
+                "ARTIST_CATALOG_TABLE": self.artist_catalog_table.table_name
             }
         )
 
@@ -75,7 +84,8 @@ class SongsStack(Stack):
             handler='songs.get_songs_by_artist.handler',
             environment={
                 "SONGS_TABLE": self.songs_table.table_name,
-                "MEDIA_BUCKET": self.media_bucket.bucket_name
+                "MEDIA_BUCKET": self.media_bucket.bucket_name,
+                "ARTIST_CATALOG_TABLE": self.artist_catalog_table.table_name
             }
         )
 
@@ -102,7 +112,6 @@ class SongsStack(Stack):
 
         self.songs_table.grant_read_write_data(self.create_song_lambda)
         self.songs_table.grant_read_write_data(self.get_songs_lambda)
-        self.songs_table.grant_read_data(self.get_songs_by_genre_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_album_lambda)
         self.media_bucket.grant_read_write(self.create_song_lambda)
@@ -111,3 +120,6 @@ class SongsStack(Stack):
 
         genres_table.grant_read_write_data(self.create_song_lambda)
         genres_table.grant_read_data(self.get_songs_lambda)
+        genre_catalog_table.grant_read_write_data(self.create_song_lambda)
+        self.artist_catalog_table.grant_read_write_data(self.create_song_lambda)
+        self.artist_catalog_table.grant_read_data(self.get_songs_by_artist_lambda)

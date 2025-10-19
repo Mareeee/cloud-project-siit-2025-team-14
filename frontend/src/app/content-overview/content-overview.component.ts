@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { SongsService } from '../services/song.service';
 import { ArtistsService } from '../services/artist.service';
 import { forkJoin } from 'rxjs';
@@ -10,33 +11,81 @@ import { Artist } from '../models/artist.model';
   templateUrl: './content-overview.component.html',
   styleUrls: ['./content-overview.component.css']
 })
-export class ContentOverviewComponent {
+export class ContentOverviewComponent implements OnInit {
   songs: Song[] = [];
   artists: Artist[] = [];
   activeAudio: HTMLAudioElement | null = null;
+  title: string = 'All Songs';
+  isLoading = false;
 
   constructor(
+    private route: ActivatedRoute,
     private songsService: SongsService,
-    private artistsService: ArtistsService,
-  ) {
-    forkJoin({
-      artists: this.artistsService.getArtists(),
-      songs: this.songsService.getSongs(),
-    }).subscribe(({ songs, artists }) => {
-      this.artists = artists.data || [];
+    private artistsService: ArtistsService
+  ) { }
 
-      this.songs = (songs.data || []).map((song: any) => {
-        const songArtists = this.artists.filter(a => song.artistIds.includes(a.id));
-        return {
-          ...song,
-          artistNames: songArtists.map(a => a.name),
-          artistBios: songArtists.map(a => a.biography),
-          artistGenres: songArtists.flatMap(a => a.genres),
-          isPlaying: false,
-          currentTime: 0,
-          duration: 0
-        };
-      });
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const artistId = params['artistId'];
+      const albumId = params['albumId'];
+
+      this.isLoading = true;
+
+      if (artistId) {
+        this.title = 'Songs by Selected Artist';
+        this.loadSongsByArtist(artistId);
+      } else if (albumId) {
+        this.title = 'Songs from Selected Album';
+        this.loadSongsByAlbum(albumId);
+      } else {
+        this.title = 'All Songs';
+        this.loadAllSongs();
+      }
+    });
+  }
+
+  private loadSongsByArtist(artistId: string) {
+    forkJoin({
+      songs: this.songsService.getSongsByArtist(artistId),
+      artists: this.artistsService.getArtists()
+    }).subscribe(({ songs, artists }) => {
+      this.setSongsWithArtists(songs.data || [], artists.data || []);
+      this.isLoading = false;
+    });
+  }
+
+  private loadSongsByAlbum(albumId: string) {
+    forkJoin({
+      songs: this.songsService.getSongsByAlbum(albumId),
+      artists: this.artistsService.getArtists()
+    }).subscribe(({ songs, artists }) => {
+      this.setSongsWithArtists(songs.data || [], artists.data || []);
+      this.isLoading = false;
+    });
+  }
+
+  private loadAllSongs() {
+    forkJoin({
+      songs: this.songsService.getSongs(),
+      artists: this.artistsService.getArtists()
+    }).subscribe(({ songs, artists }) => {
+      this.setSongsWithArtists(songs.data || [], artists.data || []);
+      this.isLoading = false;
+    });
+  }
+
+  private setSongsWithArtists(songs: any[], artists: Artist[]) {
+    this.songs = songs.map((song: any) => {
+      const songArtists = artists.filter(a => song.artistIds?.includes(a.id));
+      return {
+        ...song,
+        artistNames: songArtists.map(a => a.name),
+        artistBios: songArtists.map(a => a.biography),
+        artistGenres: songArtists.flatMap(a => a.genres),
+        isPlaying: false,
+        currentTime: 0,
+        duration: 0
+      };
     });
   }
 
