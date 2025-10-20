@@ -75,7 +75,7 @@ def handler(event, context):
         }
 
         if album_id:
-            item["album_id"] = album_id
+            item["albumId"] = album_id
 
         songs_table.put_item(Item=item)
 
