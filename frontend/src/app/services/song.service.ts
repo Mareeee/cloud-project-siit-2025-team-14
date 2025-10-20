@@ -53,7 +53,10 @@ export class SongsService {
           error: (err) => observer.error(err),
         });
     });
+  }
 
+  deleteSong(songId: string) {
+    return this.http.delete<void>(`${this.url}/${songId}`);
   }
 
   getSongsByGenre(genre: string): Observable<{ data: Song[] }> {
