@@ -49,6 +49,8 @@ class ApiStack(Stack):
         songs_res = api.root.add_resource("songs")
         songs_res.add_method("GET", apigw.LambdaIntegration(songs_stack.get_songs_lambda))
         songs_res.add_method("PUT", apigw.LambdaIntegration(songs_stack.create_song_lambda))
+        songs_res.add_resource("{songId}").add_method("DELETE", apigw.LambdaIntegration(songs_stack.delete_song_lambda))
+        songs_res.add_resource("edit/{songId}").add_method("PUT", apigw.LambdaIntegration(songs_stack.edit_song_lambda))
         songs_res.add_resource("artist").add_resource("{artistId}").add_method(
             "GET", apigw.LambdaIntegration(songs_stack.get_songs_by_artist_lambda)
         )

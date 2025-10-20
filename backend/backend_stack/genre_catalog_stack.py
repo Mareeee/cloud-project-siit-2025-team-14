@@ -26,6 +26,13 @@ class GenreCatalogStack(Stack):
             sort_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING)
         )
 
+        self.genre_catalog_table.add_global_secondary_index(
+            index_name="BySongIndex",
+            partition_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.KEYS_ONLY,
+        )
+
         self.get_entities_by_genre_lambda = _lambda.Function(
             self, "GetEntitiesByGenreLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
