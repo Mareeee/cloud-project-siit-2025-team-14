@@ -15,7 +15,6 @@ class ApiStack(Stack):
         albums_stack,
         ratings_stack,
         subscriptions_stack,
-        notifications_stack,
         transcription_stack,
         genres_stack,
         genre_catalog_stack,
@@ -96,11 +95,6 @@ class ApiStack(Stack):
         ratings_res.add_method("POST", apigw.LambdaIntegration(ratings_stack.create_rating_lambda))
         ratings_res.add_method("GET", apigw.LambdaIntegration(ratings_stack.get_ratings_lambda))
         ratings_res.add_method("DELETE", apigw.LambdaIntegration(ratings_stack.delete_rating_lambda))
-
-        notifications_res = api.root.add_resource("notifications")
-        notifications_res.add_method(
-            "POST", apigw.LambdaIntegration(notifications_stack.publish_notification_lambda)
-        )
 
         transcribe_res = api.root.add_resource("transcribe")
         transcribe_res.add_method(
