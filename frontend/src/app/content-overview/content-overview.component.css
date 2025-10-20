@@ -117,6 +117,33 @@
   text-align: right;
 }
 
+.rating-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rating-option {
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.rating-option:hover {
+  transform: scale(1.2);
+}
+
+.rating-option.active {
+  filter: drop-shadow(0 0 2px #ff4081);
+}
+
+.avg-rating {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
 .no-data-text,
 .no-data-container {
   text-align: center;

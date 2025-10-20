@@ -31,6 +31,20 @@
                         {{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}
                     </span>
                 </div>
+                <div class="rating-bar">
+                    <span class="rating-option" [class.active]="song.userRating === 'love'"
+                        (click)="rateSong(song, 'love')">❤️</span>
+
+                    <span class="rating-option" [class.active]="song.userRating === 'like'"
+                        (click)="rateSong(song, 'like')">👍</span>
+
+                    <span class="rating-option" [class.active]="song.userRating === 'dislike'"
+                        (click)="rateSong(song, 'dislike')">👎</span>
+
+                    <span class="avg-rating" *ngIf="song.averageRating">
+                        Avg: {{ song.averageRating.toFixed(1) }}
+                    </span>
+                </div>
             </div>
         </div>
     </div>
