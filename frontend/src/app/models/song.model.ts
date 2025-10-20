@@ -15,4 +15,6 @@ export interface Song {
     isPlaying?: boolean;
     duration?: number;
     currentTime?: number;
+    averageRating?: number | null;
+    userRating?: 'love' | 'like' | 'dislike' | null;
 }

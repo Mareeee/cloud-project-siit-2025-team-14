@@ -50,7 +50,7 @@ class ApiStack(Stack):
         songs_res.add_method("GET", apigw.LambdaIntegration(songs_stack.get_songs_lambda))
         songs_res.add_method("PUT", apigw.LambdaIntegration(songs_stack.create_song_lambda))
         songs_res.add_resource("{songId}").add_method("DELETE", apigw.LambdaIntegration(songs_stack.delete_song_lambda))
-        songs_res.add_resource("edit/{songId}").add_method("PUT", apigw.LambdaIntegration(songs_stack.edit_song_lambda))
+        songs_res.add_resource("edit").add_resource("{songId}").add_method("PUT", apigw.LambdaIntegration(songs_stack.edit_song_lambda))
         songs_res.add_resource("artist").add_resource("{artistId}").add_method(
             "GET", apigw.LambdaIntegration(songs_stack.get_songs_by_artist_lambda)
         )
@@ -95,6 +95,7 @@ class ApiStack(Stack):
         ratings_res = api.root.add_resource("ratings")
         ratings_res.add_method("POST", apigw.LambdaIntegration(ratings_stack.create_rating_lambda))
         ratings_res.add_method("GET", apigw.LambdaIntegration(ratings_stack.get_ratings_lambda))
+        ratings_res.add_method("DELETE", apigw.LambdaIntegration(ratings_stack.delete_rating_lambda))
 
         notifications_res = api.root.add_resource("notifications")
         notifications_res.add_method(
