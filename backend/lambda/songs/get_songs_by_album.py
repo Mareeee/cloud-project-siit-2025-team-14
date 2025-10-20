@@ -16,7 +16,7 @@ def handler(event, context):
 
         response = songs_table.query(
             IndexName="AlbumIndex",
-            KeyConditionExpression=Key("album_id").eq(album_id)
+            KeyConditionExpression=Key("albumId").eq(album_id)
         )
 
         songs = response.get("Items", [])

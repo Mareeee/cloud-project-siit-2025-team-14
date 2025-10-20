@@ -143,6 +143,8 @@ export class UploadMusicComponent implements OnInit {
       creationDate: ''
     };
 
+    console.log(newSong)
+
     this.isUploading = true;
 
     this.songsService.addSong(newSong, this.selectedCover, this.selectedAudio).subscribe({
