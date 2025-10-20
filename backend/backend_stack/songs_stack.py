@@ -23,7 +23,7 @@ class SongsStack(Stack):
         self.songs_table.add_global_secondary_index(
             index_name="AlbumIndex",
             partition_key=dynamodb.Attribute(
-                name="album_id",
+                name="albumId",
                 type=dynamodb.AttributeType.STRING
             ),
             projection_type=dynamodb.ProjectionType.ALL

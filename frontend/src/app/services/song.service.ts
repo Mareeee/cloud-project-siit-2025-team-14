@@ -23,6 +23,7 @@ export class SongsService {
       this.http
         .put<any>(this.url, {
           title: song.title,
+          albumId: song.albumId,
           artistIds: song.artistIds,
           genres: song.genres,
           coverFilename: cover.name,
