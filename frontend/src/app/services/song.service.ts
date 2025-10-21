@@ -56,36 +56,43 @@ export class SongsService {
     });
   }
 
-  editSong(song: Song, cover: File, audio: File): Observable<any> {
+  editSong(song: Song, cover: File | null, audio: File | null): Observable<any> {
     return new Observable((observer) => {
-      this.http.put<any>(this.url + "/edit/" + song.id, {
+      const payload: any = {
         title: song.title,
         albumId: song.albumId,
         artistIds: song.artistIds,
-        genres: song.genres,
-        coverFilename: cover == null ? song.imageUrl : cover.name,
-        audioFilename: cover == null ? song.audioUrl : audio.name,
-      }).subscribe({
+        genres: song.genreIds,
+      };
+
+      if (cover) payload.coverFilename = cover.name;
+      if (audio) payload.audioFilename = audio.name;
+
+      this.http.put<any>(this.url + "/edit/" + song.id, payload).subscribe({
         next: (res) => {
-          // const coverUpload$ = this.http.put(res.coverUploadUrl, cover, {
-          //   headers: { 'Content-Type': cover.type },
-          // });
+          const uploads: Observable<any>[] = [];
+          if (cover && res.coverUploadUrl) {
+            uploads.push(this.http.put(res.coverUploadUrl, cover, {
+              headers: { 'Content-Type': cover.type || 'application/octet-stream' },
+            }));
+          }
+          if (audio && res.audioUploadUrl) {
+            uploads.push(this.http.put(res.audioUploadUrl, audio, {
+              headers: { 'Content-Type': audio.type || 'application/octet-stream' },
+            }));
+          }
 
-          // const audioUpload$ = this.http.put(res.audioUploadUrl, audio, {
-          //   headers: { 'Content-Type': audio.type },
-          // });
-
-          // forkJoin([coverUpload$, audioUpload$]).subscribe({
-          //   next: () => {
-          //     observer.next({
-          //       message: 'Song Edited',
-          //       id: res.id,
-          //       title: song.title,
-          //     });
-          //     observer.complete();
-          //   },
-          //   error: (err) => observer.error(err),
-          // });
+          if (uploads.length === 0) {
+            observer.next({ message: 'Song Edited', id: res.id ?? song.id, title: song.title });
+            return observer.complete();
+          }
+          forkJoin(uploads).subscribe({
+            next: () => {
+              observer.next({ message: 'Song Edited', id: res.id ?? song.id, title: song.title });
+              observer.complete();
+            },
+            error: (err) => observer.error(err),
+          });
         },
         error: (err) => observer.error(err),
       });

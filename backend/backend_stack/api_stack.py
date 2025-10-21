@@ -56,6 +56,11 @@ class ApiStack(Stack):
         songs_res.add_resource("album").add_resource("{albumId}").add_method(
             "GET", apigw.LambdaIntegration(songs_stack.get_songs_by_album_lambda)
         )
+        songs_download_res = songs_res.add_resource("download")
+        songs_download_by_id_title = songs_download_res.add_resource("{songId}").add_resource("{title}")
+        songs_download_by_id_title.add_method(
+            "GET", apigw.LambdaIntegration(songs_stack.download_song_lambda)
+        )
 
         genres_res = api.root.add_resource("genres")
         genres_res.add_method("GET", apigw.LambdaIntegration(genres_stack.get_genres_lambda))
@@ -91,7 +96,7 @@ class ApiStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
         )
-        subs_res.add_resource("{targetId}").add_method(
+        subs_res.add_method(
             "DELETE", apigw.LambdaIntegration(subscriptions_stack.delete_subscription_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer

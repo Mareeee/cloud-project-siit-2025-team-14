@@ -80,10 +80,8 @@ export class ManageContentComponent {
     ref.afterClosed().subscribe((res: any) => {
       if (!res) return;
 
-      console.log(res)
       this.songsService.editSong(res.patch, res.newCoverFile, res.newAudioFile).subscribe({
         next: (data) => {
-          console.log(data)
           this.snackBar.open(`Song ${res.patch.title} has been edited!`, 'Close', { duration: 3000 })
 
           if (res.patch) {

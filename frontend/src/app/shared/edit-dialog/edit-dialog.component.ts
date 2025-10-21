@@ -70,6 +70,8 @@ export class ContentEditDialogComponent implements OnInit {
       albumId: this.s.albumId ?? '',
     });
 
+    this.form.get('title')?.disable({ emitEvent: false });
+
     if (this.s.imageUrl) {
       this.coverPreview = this.s.imageUrl;
       this.form.get('coverPreview')?.setValue(this.s.imageUrl);

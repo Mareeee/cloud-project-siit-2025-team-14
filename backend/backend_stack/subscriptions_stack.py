@@ -11,7 +11,7 @@ from aws_cdk import (
 )
 
 class SubscriptionsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, artist_table, genre_table, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.subscriptions_table = dynamodb.Table(
@@ -79,9 +79,13 @@ class SubscriptionsStack(Stack):
             code=_lambda.Code.from_asset("lambda"),
             handler="subscriptions.get_subscriptions.handler",
             environment={
-                "TABLE_NAME": self.subscriptions_table.table_name
+                "SUBSCRIPTIONS_TABLE": self.subscriptions_table.table_name,
+                "ARTISTS_TABLE": artist_table.table_name,
+                "GENRES_TABLE": genre_table.table_name
             },
         )
+        artist_table.grant_read_data(self.get_subscriptions_lambda)
+        genre_table.grant_read_data(self.get_subscriptions_lambda)
 
         self.delete_subscription_lambda = _lambda.Function(
             self, "DeleteSubscriptionLambda",
