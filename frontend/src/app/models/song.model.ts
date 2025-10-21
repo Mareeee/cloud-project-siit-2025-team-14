@@ -5,6 +5,7 @@ export interface Song {
     albumId: string;
     creationDate: string;
     genres: string[];
+    genreIds?: string[];
     imageUrl?: string;
     artistName?: string;
     artistBio?: string;
@@ -17,4 +18,5 @@ export interface Song {
     currentTime?: number;
     averageRating?: number | null;
     userRating?: 'love' | 'like' | 'dislike' | null;
+    isOffline?: boolean;
 }

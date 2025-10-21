@@ -18,6 +18,12 @@ class ArtistsStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY
         )
+        
+        self.artists_table.add_global_secondary_index(
+            index_name="ArtistIdIndex",
+            partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.ALL
+        )
 
         self.artists_table.add_global_secondary_index(
             index_name="ArtistIdIndex",

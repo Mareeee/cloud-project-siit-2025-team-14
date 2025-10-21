@@ -86,6 +86,16 @@
                             (input)="seek(song, audioElem)" class="audio-slider" />
                         <span class="time">{{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}</span>
                     </div>
+                    <div class="download-section">
+                        <button mat-raised-button color="primary" (click)="downloadSong(song)">
+                            ⬇ Download
+                        </button>
+                    </div>
+                    <div class="offline-actions">
+                        <button mat-raised-button color="primary" (click)="downloadOffline(song)">
+                            {{ song.isOffline ? 'Remove Offline Copy' : 'Download Offline' }}
+                        </button>
+                    </div>
                 </mat-card-content>
             </mat-card>
         </div>
