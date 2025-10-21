@@ -82,18 +82,27 @@ class ApiStack(Stack):
 
         subs_res = api.root.add_resource("subscriptions")
         subs_res.add_method(
-            "POST", apigw.LambdaIntegration(subscriptions_stack.create_subscription_lambda)
+            "POST", apigw.LambdaIntegration(subscriptions_stack.create_subscription_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
         subs_res.add_method(
-            "GET", apigw.LambdaIntegration(subscriptions_stack.get_subscriptions_lambda)
+            "GET", apigw.LambdaIntegration(subscriptions_stack.get_subscriptions_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
         subs_res.add_resource("{targetId}").add_method(
-            "DELETE", apigw.LambdaIntegration(subscriptions_stack.delete_subscription_lambda)
+            "DELETE", apigw.LambdaIntegration(subscriptions_stack.delete_subscription_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
+        new_content_res = api.root.add_resource("new-content")
+        new_content_res.add_method("POST", apigw.LambdaIntegration(subscriptions_stack.notifier_lambda))
 
         ratings_res = api.root.add_resource("ratings")
         ratings_res.add_method("POST", apigw.LambdaIntegration(ratings_stack.create_rating_lambda))
         ratings_res.add_method("GET", apigw.LambdaIntegration(ratings_stack.get_ratings_lambda))
+        ratings_res.add_method("DELETE", apigw.LambdaIntegration(ratings_stack.delete_rating_lambda))
 
         transcribe_res = api.root.add_resource("transcribe")
         transcribe_res.add_method(

@@ -5,6 +5,8 @@ import { ArtistsService } from '../services/artist.service';
 import { forkJoin } from 'rxjs';
 import { Song } from '../models/song.model';
 import { Artist } from '../models/artist.model';
+import { AuthService } from '../auth/auth.service';
+import { RatingsService } from '../services/ratings.service';
 
 @Component({
   selector: 'app-content-overview',
@@ -17,14 +19,19 @@ export class ContentOverviewComponent implements OnInit {
   activeAudio: HTMLAudioElement | null = null;
   title: string = 'All Songs';
   isLoading = false;
+  currentUserId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private songsService: SongsService,
-    private artistsService: ArtistsService
+    private artistsService: ArtistsService,
+    private ratingsService: RatingsService,
+    private authService: AuthService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.currentUserId = await this.authService.getUserId();
+
     this.route.queryParams.subscribe(params => {
       const artistId = params['artistId'];
       const albumId = params['albumId'];
@@ -79,13 +86,61 @@ export class ContentOverviewComponent implements OnInit {
       const songArtists = artists.filter(a => song.artistIds?.includes(a.id));
       return {
         ...song,
+        id: song.id || song.entityId || song.songId,
         artistNames: songArtists.map(a => a.name),
         artistBios: songArtists.map(a => a.biography),
         artistGenres: songArtists.flatMap(a => a.genres),
         isPlaying: false,
         currentTime: 0,
-        duration: 0
+        duration: 0,
+        averageRating: null,
+        userRating: null
       };
+    });
+
+    this.songs.forEach(song => {
+      this.ratingsService.getRatings(song.id).subscribe(res => {
+        song.averageRating = res.averageRating;
+      });
+
+      if (this.currentUserId) {
+        this.ratingsService.getUserRating(this.currentUserId, song.id).subscribe(res => {
+          song.userRating = res.userRating;
+        });
+      }
+    });
+  }
+
+  rateSong(song: Song, rating: 'love' | 'like' | 'dislike') {
+    if (!this.currentUserId) {
+      alert('You must be logged in to rate songs.');
+      return;
+    }
+
+    const isSameRating = song.userRating === rating;
+
+    if (isSameRating) {
+      this.ratingsService.deleteRating(this.currentUserId, song.id).subscribe({
+        next: () => {
+          song.userRating = null;
+          this.refreshAverage(song);
+        },
+        error: () => alert('Failed to delete rating.')
+      });
+    } else {
+      this.ratingsService.createRating(this.currentUserId, song.id, rating).subscribe({
+        next: () => {
+          song.userRating = rating;
+          this.refreshAverage(song);
+        },
+        error: () => alert('Failed to save rating.')
+      });
+    }
+  }
+
+  private refreshAverage(song: Song) {
+    this.ratingsService.getRatings(song.id).subscribe(res => {
+      song.averageRating = res.averageRating;
     });
   }
 

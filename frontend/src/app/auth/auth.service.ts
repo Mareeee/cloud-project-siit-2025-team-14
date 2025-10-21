@@ -93,4 +93,14 @@ export class AuthService {
     this.isLoggedIn$.next(false);
     this.userRole$.next(null);
   }
+
+  async getUserId(): Promise<string | null> {
+    try {
+      const session = await fetchAuthSession();
+      const payload = session.tokens?.idToken?.payload ?? {};
+      return payload['sub'] || null;
+    } catch {
+      return null;
+    }
+  }
 }
