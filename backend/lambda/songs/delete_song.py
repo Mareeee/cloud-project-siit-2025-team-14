@@ -13,6 +13,13 @@ genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
 
+def _delete_s3_prefix(bucket_name: str, prefix: str):
+    paginator = s3.get_paginator('list_objects_v2')
+    for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
+        objects = [{'Key': obj['Key']} for obj in page.get('Contents', [])]
+        if objects:
+            s3.delete_objects(Bucket=bucket_name, Delete={'Objects': objects, 'Quiet': True})
+
 def _delete_all_edges_for_song(song_id: str):
     resp = genre_catalog_table.query(
         IndexName="BySongIndex",
@@ -73,15 +80,10 @@ def handler(event, context):
         item = items[0]
         title = item['title']
 
-        audio_key = item.get('s3KeyAudio')
-        cover_key = item.get('s3KeyCover')
-
-        if audio_key:
-            s3.delete_object(Bucket=bucket, Key=audio_key)
-        if cover_key:
-            s3.delete_object(Bucket=bucket, Key=cover_key)
+        _delete_s3_prefix(bucket, f"{song_id}/")
 
         songs_table.delete_item(Key={'id': song_id, 'title': title})
+
         _delete_all_edges_for_song(song_id)
 
         return create_response(200, {"message": True})
