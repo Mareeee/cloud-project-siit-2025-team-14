@@ -8,7 +8,7 @@ from aws_cdk import (
 )
 
 class SongsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, genres_table, genre_catalog_table, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, genres_table, genre_catalog_table, ratings_table, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.songs_table = dynamodb.Table(
@@ -161,17 +161,6 @@ class SongsStack(Stack):
             }
         )
 
-        self.download_song_lambda = _lambda.Function(
-            self, "DownloadSongLambda",
-            runtime=_lambda.Runtime.PYTHON_3_9,
-            code=_lambda.Code.from_asset("lambda"),
-            handler="songs.get_presigned_download_url.handler",
-            environment={
-                "SONGS_TABLE": self.songs_table.table_name,
-                "MEDIA_BUCKET": self.media_bucket.bucket_name
-            }
-        )
-
         self.songs_table.grant_read_write_data(self.create_song_lambda)
         self.songs_table.grant_read_write_data(self.get_songs_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_artist_lambda)
@@ -197,3 +186,4 @@ class SongsStack(Stack):
         self.artist_catalog_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.artist_catalog_table.grant_read_write_data(self.delete_song_lambda)
         self.artist_catalog_table.grant_read_write_data(self.edit_song_lambda)
+        ratings_table.grant_read_write_data(self.delete_song_lambda)

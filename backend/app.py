@@ -17,13 +17,13 @@ app = cdk.App()
 
 genres_stack = GenresStack(app, "GenresStack")
 genre_catalog_stack = GenreCatalogStack(app, "GenreCatalogStack")
+ratings_stack = RatingsStack(app, "RatingsStack")
 
 artists_stack = ArtistsStack(app, "ArtistsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table)
-songs_stack = SongsStack(app, "SongsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table)
+songs_stack = SongsStack(app, "SongsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table, ratings_table=ratings_stack.ratings_table)
 albums_stack = AlbumsStack(app, "AlbumsStack", genres_table=genres_stack.genres_table, artists_table=artists_stack.artists_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table)
 
 auth_stack = AuthStack(app, "AuthStack")
-ratings_stack = RatingsStack(app, "RatingsStack")
 subscriptions_stack = SubscriptionsStack(app, "SubscriptionsStack", artist_table=artists_stack.artists_table, genre_table=genres_stack.genres_table)
 transcription_stack = TranscriptionStack(app, "TranscriptionStack")
 seeder_stack = SeederStack(app, "SeederStack")

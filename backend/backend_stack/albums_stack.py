@@ -32,6 +32,19 @@ class AlbumsStack(Stack):
             }
         )
 
+        self.delete_album_lambda = _lambda.Function(
+            self, 'DeleteAlbumLambda',
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='albums.delete_album.handler',
+            environment={
+                "ALBUMS_TABLE": self.albums_table.table_name,
+                "GENRES_TABLE": genres_table.table_name,
+                "ARTISTS_TABLE": artists_table.table_name,
+                "GENRE_CATALOG_TABLE": genre_catalog_table.table_name
+            }
+        )
+
         self.get_albums_lambda = _lambda.Function(
             self, 'GetAlbumsLambda',
             runtime=_lambda.Runtime.PYTHON_3_9,
