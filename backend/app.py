@@ -24,7 +24,7 @@ albums_stack = AlbumsStack(app, "AlbumsStack", genres_table=genres_stack.genres_
 
 auth_stack = AuthStack(app, "AuthStack")
 ratings_stack = RatingsStack(app, "RatingsStack")
-subscriptions_stack = SubscriptionsStack(app, "SubscriptionsStack")
+subscriptions_stack = SubscriptionsStack(app, "SubscriptionsStack", artist_table=artists_stack.artists_table, genre_table=genres_stack.genres_table)
 transcription_stack = TranscriptionStack(app, "TranscriptionStack")
 seeder_stack = SeederStack(app, "SeederStack")
 

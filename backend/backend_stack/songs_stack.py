@@ -29,6 +29,11 @@ class SongsStack(Stack):
             projection_type=dynamodb.ProjectionType.ALL
         )
 
+        self.songs_table.add_global_secondary_index(
+            index_name="SongIdIndex",
+            partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING)
+        )
+
         self.artist_catalog_table = dynamodb.Table(
             self, "ArtistCatalogTable",
             table_name="ArtistCatalogTable",
@@ -144,23 +149,40 @@ class SongsStack(Stack):
                 "MEDIA_BUCKET": self.media_bucket.bucket_name
             }
         )
+        
+        self.download_song_lambda = _lambda.Function(
+            self, "DownloadSongLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda"),
+            handler="songs.get_presigned_download_url.handler",
+            environment={
+                "SONGS_TABLE": self.songs_table.table_name,
+                "MEDIA_BUCKET": self.media_bucket.bucket_name
+            }
+        )
 
         self.songs_table.grant_read_write_data(self.create_song_lambda)
         self.songs_table.grant_read_write_data(self.get_songs_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_album_lambda)
         self.songs_table.grant_read_write_data(self.delete_song_lambda)
+        self.songs_table.grant_read_write_data(self.edit_song_lambda)
+        self.songs_table.grant_read_data(self.download_song_lambda)
         self.media_bucket.grant_read_write(self.create_song_lambda)
         self.media_bucket.grant_read_write(self.get_songs_lambda)
         self.media_bucket.grant_read_write(self.get_songs_by_artist_lambda)
         self.media_bucket.grant_read_write(self.get_songs_by_album_lambda)
         self.media_bucket.grant_read_write(self.delete_song_lambda)
+        self.media_bucket.grant_read_write(self.edit_song_lambda)
         self.media_bucket.grant_put(self.presign_lambda)
-
+        self.media_bucket.grant_read(self.download_song_lambda)
         genres_table.grant_read_write_data(self.create_song_lambda)
         genres_table.grant_read_data(self.get_songs_lambda)
+        genres_table.grant_read_data(self.edit_song_lambda)
         genre_catalog_table.grant_read_write_data(self.create_song_lambda)
         genre_catalog_table.grant_read_write_data(self.delete_song_lambda)
+        genre_catalog_table.grant_read_write_data(self.edit_song_lambda)
         self.artist_catalog_table.grant_read_write_data(self.create_song_lambda)
         self.artist_catalog_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.artist_catalog_table.grant_read_write_data(self.delete_song_lambda)
+        self.artist_catalog_table.grant_read_write_data(self.edit_song_lambda)

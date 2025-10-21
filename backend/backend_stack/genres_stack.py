@@ -35,4 +35,10 @@ class GenresStack(Stack):
             projection_type=dynamodb.ProjectionType.ALL
         )
 
+        self.genres_table.add_global_secondary_index(
+            index_name="GenreIdIndex",
+            partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.ALL
+        )
+
         self.genres_table.grant_read_data(self.get_genres_lambda)
