@@ -22,7 +22,6 @@ def _get_or_create_genre(genre_name):
     genres_table.put_item(Item={"id": genre_id, "name": genre_name})
     return {"id": genre_id, "name": genre_name}
 
-
 def handler(event, context):
     try:
         album_id = event.get("pathParameters", {}).get("albumId")

@@ -25,4 +25,18 @@ export class AlbumsService {
     getAlbumsByGenre(genre: string): Observable<{ data: Album[] }> {
         return this.http.get<{ data: Album[] }>(`${this.url}/genre/${encodeURIComponent(genre)}`);
     }
+
+    editAlbum(albumId: string, patch: Partial<Album>) {
+        return this.http.put<{ message: string }>(
+            `${this.url}/${encodeURIComponent(albumId)}`,
+            patch
+        );
+    }
+
+    deleteAlbum(albumId: string) {
+        return this.http.delete<{ message: string }>(
+            `${this.url}/${encodeURIComponent(albumId)}`
+        );
+    }
+
 }
