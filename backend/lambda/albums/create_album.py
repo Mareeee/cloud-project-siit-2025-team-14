@@ -67,17 +67,18 @@ def handler(event, context):
                 "releaseDate": release_date
             })
 
-        sns.publish(
-            TopicArn=TOPIC_ARN,
-            Message=json.dumps({
-                "targetId": album_id,
-                "contentInfo": {
-                    "type": "album",
-                    "title": title,
-                    "releaseDate": release_date,
-                }
-            })
-        )
+        for targetId in genre_ids.extend(valid_artist_ids):
+            sns.publish(
+                TopicArn=TOPIC_ARN,
+                Message=json.dumps({
+                    "targetId": targetId,
+                    "contentInfo": {
+                        "type": "album",
+                        "title": title,
+                        "releaseDate": release_date,
+                    }
+                })
+            )
 
         return create_response(200, {
             "message": f'Album "{title}" created successfully.',
