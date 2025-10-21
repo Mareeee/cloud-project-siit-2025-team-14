@@ -9,7 +9,7 @@ dynamodb = boto3.resource("dynamodb")
 bucket = os.environ["MEDIA_BUCKET"]
 songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
-ratings_table = dynamodb.Table(os.environ["RATINGS_TABLE"])
+# ratings_table = dynamodb.Table(os.environ["RATINGS_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
 
@@ -62,6 +62,12 @@ def _delete_all_edges_for_song(song_id: str):
             for it in items:
                 batch.delete_item(Key={'PK': it['PK'], 'SK': it['SK']})
 
+    # resp = ratings_table.query(
+    #     IndexName="BySongIndex",
+    #     KeyConditionExpression=Key("contentId").eq(song_id)
+    # )
+    # items = resp.get('Items', [])
+
 def handler(event, context):
     try:
         song_id = event["pathParameters"]["songId"]
@@ -83,7 +89,6 @@ def handler(event, context):
         _delete_s3_prefix(bucket, f"{song_id}/")
 
         songs_table.delete_item(Key={'id': song_id, 'title': title})
-        ratings_table.delete_item(Key={'contentId': song_id})
 
         _delete_all_edges_for_song(song_id)
 

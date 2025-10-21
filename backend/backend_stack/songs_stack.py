@@ -116,7 +116,8 @@ class SongsStack(Stack):
                 "MEDIA_BUCKET": self.media_bucket.bucket_name,
                 "GENRES_TABLE": genres_table.table_name,
                 "GENRE_CATALOG_TABLE": genre_catalog_table.table_name,
-                "ARTIST_CATALOG_TABLE": self.artist_catalog_table.table_name
+                "ARTIST_CATALOG_TABLE": self.artist_catalog_table.table_name,
+                "RATINGS_TABLE": ratings_table.table_name
             }
         )
 
