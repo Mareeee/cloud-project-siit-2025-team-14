@@ -188,10 +188,23 @@ export class ManageContentComponent {
       data: { artist }
     });
 
-    ref.afterClosed().subscribe((res: ArtistEditResult | null) => {
-      if (!res?.patch) return;
-      const idx = this.artists.findIndex(a => a.id === artist.id);
-      if (idx > -1) this.artists[idx] = { ...this.artists[idx], ...res.patch };
+    ref.afterClosed().subscribe((res: any) => {
+      if (!res) return;
+
+      this.artistsService.editArtist(res.patch).subscribe({
+        next: (data) => {
+          this.snackBar.open(`Artist ${res.patch.name} has been edited!`, 'Close', { duration: 3000 })
+
+          if (!res?.patch) return;
+          const idx = this.artists.findIndex(a => a.id === artist.id);
+          if (idx > -1) this.artists[idx] = { ...this.artists[idx], ...res.patch };
+
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Failed to artist.', 'Close', { duration: 3000 })
+        }
+      });
     });
   }
 
@@ -217,10 +230,11 @@ Note: Deleting an artist does not delete songs.`,
       this.artists = this.artists.filter(a => a.id !== artist.id);
       this.artistsService.deleteArtist(artist.id).subscribe({
         next: (data) => {
-          console.log(data)
+          console.log("artist-deleted-log", data)
           this.snackBar.open('Artist deleted', 'Close', { duration: 2000 });
         },
         error: (err) => {
+          console.log("artist-fail-delete-log")
           console.error(err);
           this.snackBar.open('Delete failed. Please try again.', 'Close', { duration: 3000 });
         }

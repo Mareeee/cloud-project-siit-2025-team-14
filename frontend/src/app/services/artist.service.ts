@@ -29,4 +29,8 @@ export class ArtistsService {
     deleteArtist(artistId: string): Observable<boolean> {
         return this.http.delete<boolean>(`${this.url}/${artistId}`)
     }
+
+    editArtist(artist: Artist): Observable<any> {
+        return this.http.put<any>(`${this.url}/${artist.id}`, { artist })
+    }
 }

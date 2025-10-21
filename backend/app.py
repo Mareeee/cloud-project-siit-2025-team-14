@@ -29,6 +29,7 @@ transcription_stack = TranscriptionStack(app, "TranscriptionStack")
 seeder_stack = SeederStack(app, "SeederStack")
 
 albums_stack.albums_table.grant_read_write_data(artists_stack.delete_artist_lambda)
+artists_stack.delete_artist_lambda.add_environment("ALBUMS_TABLE", albums_stack.albums_table.table_name)
 
 ApiStack(app, "ApiStack",
           songs_stack=songs_stack,
