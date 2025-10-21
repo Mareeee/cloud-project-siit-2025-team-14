@@ -69,7 +69,14 @@ def handler(event, context):
 
         sns.publish(
             TopicArn=TOPIC_ARN,
-            Message=json.dumps(item)
+            Message=json.dumps({
+                "targetId": album_id,
+                "contentInfo": {
+                    "type": "album",
+                    "title": title,
+                    "releaseDate": release_date,
+                }
+            })
         )
 
         return create_response(200, {

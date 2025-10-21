@@ -36,13 +36,26 @@ def handler(event, context):
 
 
 def send_email(to_email, target_id, content_info):
+    content_type = content_info.get("type")
+
+    if content_type == "artist":
+        subject = f"New Artist Created: {content_info['name']}"
+        body = f"Artist Name: {content_info['name']}\nBiography: {content_info.get('biography', '')}"
+    elif content_type == "album":
+        subject = f"New Album Released: {content_info['title']}"
+        body = f"Album Title: {content_info['title']}\nRelease Date: {content_info['releaseDate']}"
+    elif content_type == "song":
+        subject = f"New Song Available: {content_info['title']}"
+        body = f"Song Title: {content_info['title']}\nRelease Date: {content_info['releaseDate']}"
+    else:
+        subject = f"New Content: {target_id}"
+        body = json.dumps(content_info, indent=2)
+
     ses.send_email(
         Source=SOURCE_EMAIL,
         Destination={"ToAddresses": [to_email]},
         Message={
-            "Subject": {"Data": f"New Content: {target_id}"},
-            "Body": {
-                "Text": {"Data": f"New content has been uploaded:\n\n{json.dumps(content_info, indent=2)}"}
-            },
+            "Subject": {"Data": subject},
+            "Body": {"Text": {"Data": body}},
         },
     )
