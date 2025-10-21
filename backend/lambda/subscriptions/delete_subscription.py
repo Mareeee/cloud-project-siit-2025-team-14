@@ -1,19 +1,29 @@
+import json
 import os
 import boto3
 from utils.utils import create_response
 
-dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table(os.environ["SUBSCRIPTIONS_TABLE"])
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table(os.environ['TABLE_NAME'])
 
 def handler(event, context):
     try:
-        user_id = event["queryStringParameters"].get("userId")
-        target_id = event["pathParameters"].get("targetId")
+        subscription_id = event.get("queryStringParameters", {}).get("subscriptionId")
+        if not subscription_id:
+            return create_response(400, {"message": "subscriptionId is required."})
 
-        if not user_id or not target_id:
-            return create_response(400, {"message": "User ID and Target ID required."})
+        response = table.query(
+            IndexName="subscriptionId-index",
+            KeyConditionExpression=boto3.dynamodb.conditions.Key("subscriptionId").eq(subscription_id)
+        )
+        items = response.get("Items", [])
+        if not items:
+            return create_response(404, {"message": "Subscription not found."})
 
-        table.delete_item(Key={"userId": user_id, "targetId": target_id})
-        return create_response(200, {"message": "Unsubscribed successfully."})
+        item = items[0]
+        table.delete_item(Key={"userId": item["userId"], "targetId": item["targetId"]})
+
+        return create_response(200, {"message": f"Unsubscribed successfully."})
+
     except Exception as e:
         return create_response(500, {"message": str(e)})
