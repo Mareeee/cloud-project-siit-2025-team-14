@@ -82,7 +82,9 @@ class ApiStack(Stack):
         albums_res = api.root.add_resource("albums")
         albums_res.add_method("GET", apigw.LambdaIntegration(albums_stack.get_albums_lambda))
         albums_res.add_method("POST", apigw.LambdaIntegration(albums_stack.create_album_lambda))
-        albums_res.add_resource("{albumId}").add_method("DELETE", apigw.LambdaIntegration(albums_stack.delete_album_lambda))
+        album_item_res = albums_res.add_resource("{albumId}")
+        album_item_res.add_method("DELETE", apigw.LambdaIntegration(albums_stack.delete_album_lambda))
+        album_item_res.add_method("PUT", apigw.LambdaIntegration(albums_stack.edit_album_lambda))
 
         presign_res = api.root.add_resource("presign")
         presign_res.add_method("GET", apigw.LambdaIntegration(songs_stack.presign_lambda))

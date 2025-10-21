@@ -7,7 +7,7 @@ from aws_cdk import (
 )
 
 class AlbumsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, genres_table, artists_table, genre_catalog_table, topic, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, genres_table, genre_catalog_table, topic, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.albums_table = dynamodb.Table(
@@ -17,6 +17,10 @@ class AlbumsStack(Stack):
             sort_key=dynamodb.Attribute(name="title", type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY
+        )
+
+        artists_table = dynamodb.Table.from_table_name(
+            self, "ArtistsTableImport", "ArtistsTable"
         )
 
         self.create_album_lambda = _lambda.Function(
@@ -40,12 +44,10 @@ class AlbumsStack(Stack):
             handler='albums.delete_album.handler',
             environment={
                 "ALBUMS_TABLE": self.albums_table.table_name,
-                "GENRES_TABLE": genres_table.table_name,
-                "ARTISTS_TABLE": artists_table.table_name,
                 "GENRE_CATALOG_TABLE": genre_catalog_table.table_name
             }
         )
-        
+
         topic.grant_publish(self.create_album_lambda)
 
         self.get_albums_lambda = _lambda.Function(
@@ -58,13 +60,32 @@ class AlbumsStack(Stack):
                 "GENRES_TABLE": genres_table.table_name
             }
         )
+        
+        self.edit_album_lambda = _lambda.Function(
+            self, 'EditAlbumLambda',
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='albums.edit_album.handler',
+            environment={
+                "ALBUMS_TABLE": self.albums_table.table_name,
+                "GENRES_TABLE": genres_table.table_name,
+                "ARTISTS_TABLE": artists_table.table_name,
+                "GENRE_CATALOG_TABLE": genre_catalog_table.table_name
+            }
+        )
 
         self.albums_table.grant_read_write_data(self.create_album_lambda)
         self.albums_table.grant_read_write_data(self.get_albums_lambda)
+        self.albums_table.grant_read_write_data(self.edit_album_lambda)
+        self.albums_table.grant_read_write_data(self.delete_album_lambda)
 
         genres_table.grant_read_write_data(self.create_album_lambda)
         genres_table.grant_read_data(self.get_albums_lambda)
+        genres_table.grant_read_write_data(self.edit_album_lambda)
 
-        artists_table.grant_read_data(self.create_album_lambda)
-        
         genre_catalog_table.grant_read_write_data(self.create_album_lambda)
+        genre_catalog_table.grant_read_write_data(self.delete_album_lambda)
+        genre_catalog_table.grant_read_write_data(self.edit_album_lambda)
+
+        artists_table.grant_read_write_data(self.create_album_lambda)
+        artists_table.grant_read_data(self.edit_album_lambda)

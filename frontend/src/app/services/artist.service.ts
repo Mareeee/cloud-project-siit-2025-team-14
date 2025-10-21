@@ -25,4 +25,8 @@ export class ArtistsService {
     getArtistsByGenre(genre: string): Observable<{ data: Artist[] }> {
         return this.http.get<{ data: Artist[] }>(`${this.url}/genre/${encodeURIComponent(genre)}`);
     }
+
+    deleteArtist(artistId: string): Observable<boolean> {
+        return this.http.delete<boolean>(`${this.url}/${artistId}`)
+    }
 }
