@@ -14,10 +14,12 @@
 
         <mat-form-field appearance="fill" class="full-width">
             <mat-label>Genres</mat-label>
-            <mat-select multiple required formControlName="genres">
-                <mat-option *ngFor="let genre of genres" [value]="genre">{{ genre }}</mat-option>
+            <mat-select multiple required formControlName="genreIds">
+                <mat-option *ngFor="let genre of genres" [value]="genre.id">
+                    {{ genre.name }}
+                </mat-option>
             </mat-select>
-            <mat-error *ngIf="form.get('genres')?.invalid && form.get('genres')?.touched">
+            <mat-error *ngIf="form.get('genreIds')?.invalid && form.get('genreIds')?.touched">
                 Please select song genres.
             </mat-error>
         </mat-form-field>
@@ -25,7 +27,9 @@
         <mat-form-field appearance="fill" class="full-width">
             <mat-label>Artist</mat-label>
             <mat-select multiple required formControlName="artistIds">
-                <mat-option *ngFor="let artist of artists" [value]="artist.id">{{ artist.name }}</mat-option>
+                <mat-option *ngFor="let artist of artists" [value]="artist.id">
+                    {{ artist.name }}
+                </mat-option>
             </mat-select>
             <mat-error *ngIf="form.get('artistIds')?.invalid && form.get('artistIds')?.touched">
                 Please select song artist.
@@ -35,7 +39,9 @@
         <mat-form-field appearance="fill" class="full-width">
             <mat-label>Album</mat-label>
             <mat-select formControlName="albumId">
-                <mat-option *ngFor="let album of albums" [value]="album.id">{{ album.title }}</mat-option>
+                <mat-option *ngFor="let album of albums" [value]="album.id">
+                    {{ album.title }}
+                </mat-option>
             </mat-select>
         </mat-form-field>
 
@@ -56,6 +62,9 @@
                 </button>
                 <input #coverInput type="file" accept="image/*" (change)="onCoverSelected($event)" hidden />
             </div>
+            <mat-error *ngIf="form.get('coverPreview')?.invalid && form.get('coverPreview')?.touched">
+                Please select song cover.
+            </mat-error>
         </div>
 
         <div class="audio-upload-container">
@@ -74,6 +83,9 @@
                     </label>
                 </ng-template>
             </div>
+            <mat-error *ngIf="form.get('audioPreview')?.invalid && form.get('audioPreview')?.touched">
+                Please select audio file.
+            </mat-error>
         </div>
 
         <div class="upload-spinner" *ngIf="isUploading" style="margin: 20px auto;">
@@ -81,15 +93,9 @@
                 class="light-spinner"></mat-progress-spinner>
         </div>
 
-        <div class="form-check full-width" style="margin: 20px 0; color: #fff;">
-            <mat-checkbox formControlName="isFullAlbum" class="light-checkbox" color="accent">
-                Add as part of a full album
-            </mat-checkbox>
-        </div>
-
         <div class="form-buttons">
             <button mat-raised-button type="button" class="cancel" (click)="cancel()">Cancel</button>
-            <button mat-raised-button class="submit" type="submit">Save</button>
+            <button mat-raised-button class="submit" type="submit">Edit</button>
         </div>
     </form>
 </div>

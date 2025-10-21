@@ -80,16 +80,28 @@ export class ManageContentComponent {
     ref.afterClosed().subscribe((res: any) => {
       if (!res) return;
 
-      if (res.patch) {
-        const idx = this.songs.findIndex(s => s.id === song.id);
-        if (idx > -1) this.songs[idx] = { ...this.songs[idx], ...res.patch };
-      }
+      console.log(res)
+      this.songsService.editSong(res.patch, res.newCoverFile, res.newAudioFile).subscribe({
+        next: (data) => {
+          console.log(data)
+          this.snackBar.open(`Song ${res.patch.title} has been edited!`, 'Close', { duration: 3000 })
 
-      if (res.newCoverFile) {
-        const previewUrl = URL.createObjectURL(res.newCoverFile);
-        const idx = this.songs.findIndex(s => s.id === song.id);
-        if (idx > -1) this.songs[idx] = { ...this.songs[idx], imageUrl: previewUrl };
-      }
+          if (res.patch) {
+            const idx = this.songs.findIndex(s => s.id === song.id);
+            if (idx > -1) this.songs[idx] = { ...this.songs[idx], ...res.patch };
+          }
+
+          if (res.newCoverFile) {
+            const previewUrl = URL.createObjectURL(res.newCoverFile);
+            const idx = this.songs.findIndex(s => s.id === song.id);
+            if (idx > -1) this.songs[idx] = { ...this.songs[idx], imageUrl: previewUrl };
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Failed to edit song.', 'Close', { duration: 3000 })
+        }
+      });
     });
   }
 

@@ -56,6 +56,42 @@ export class SongsService {
     });
   }
 
+  editSong(song: Song, cover: File, audio: File): Observable<any> {
+    return new Observable((observer) => {
+      this.http.put<any>(this.url + "/edit/" + song.id, {
+        title: song.title,
+        albumId: song.albumId,
+        artistIds: song.artistIds,
+        genres: song.genres,
+        coverFilename: cover == null ? song.imageUrl : cover.name,
+        audioFilename: cover == null ? song.audioUrl : audio.name,
+      }).subscribe({
+        next: (res) => {
+          // const coverUpload$ = this.http.put(res.coverUploadUrl, cover, {
+          //   headers: { 'Content-Type': cover.type },
+          // });
+
+          // const audioUpload$ = this.http.put(res.audioUploadUrl, audio, {
+          //   headers: { 'Content-Type': audio.type },
+          // });
+
+          // forkJoin([coverUpload$, audioUpload$]).subscribe({
+          //   next: () => {
+          //     observer.next({
+          //       message: 'Song Edited',
+          //       id: res.id,
+          //       title: song.title,
+          //     });
+          //     observer.complete();
+          //   },
+          //   error: (err) => observer.error(err),
+          // });
+        },
+        error: (err) => observer.error(err),
+      });
+    });
+  }
+
   deleteSong(songId: string) {
     return this.http.delete<void>(`${this.url}/${songId}`);
   }

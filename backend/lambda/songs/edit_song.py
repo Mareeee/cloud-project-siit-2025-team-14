@@ -1,22 +1,30 @@
 import os
 import boto3
-import uuid
 import json
-from datetime import datetime
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Attr
 from utils.utils import create_response
 
 s3 = boto3.client("s3")
 bucket = os.environ["MEDIA_BUCKET"]
 dynamodb = boto3.resource("dynamodb")
-
 songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
-genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
-genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
-artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
 
 def handler(event, context):
-    song_id = event["pathParameters"]["id"]
+    song_id = str(event["pathParameters"]["songId"]).strip()
 
-    # songs_table.delete_item(Key={'id': song_id})
-    return {"statusCode": 204}
+    try:
+        response = songs_table.query(
+            IndexName="SongIdIndex",
+            KeyConditionExpression=boto3.dynamodb.conditions.Key("id").eq(song_id)
+        )
+        items = response.get("Items", [])
+        majketi = items[0]
+        if not items:
+            return create_response(404, {"message": "Song not found."})
+    except Exception as e:
+        return create_response(400, {"message": "DynamoDB get_item failed", "error": str(e)})
+
+    if not majketi:
+        return create_response(404, {"message": f"Song with id {song_id} not found."})
+
+    return create_response(200, {"message": items})

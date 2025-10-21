@@ -5,6 +5,7 @@ export interface Song {
     albumId: string;
     creationDate: string;
     genres: string[];
+    genreIds?: string[];
     imageUrl?: string;
     artistName?: string;
     artistBio?: string;

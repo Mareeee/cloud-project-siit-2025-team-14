@@ -29,6 +29,11 @@ class SongsStack(Stack):
             projection_type=dynamodb.ProjectionType.ALL
         )
 
+        self.songs_table.add_global_secondary_index(
+            index_name="SongIdIndex",
+            partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING)
+        )
+
         self.artist_catalog_table = dynamodb.Table(
             self, "ArtistCatalogTable",
             table_name="ArtistCatalogTable",
@@ -150,17 +155,21 @@ class SongsStack(Stack):
         self.songs_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_album_lambda)
         self.songs_table.grant_read_write_data(self.delete_song_lambda)
+        self.songs_table.grant_read_write_data(self.edit_song_lambda)
         self.media_bucket.grant_read_write(self.create_song_lambda)
         self.media_bucket.grant_read_write(self.get_songs_lambda)
         self.media_bucket.grant_read_write(self.get_songs_by_artist_lambda)
         self.media_bucket.grant_read_write(self.get_songs_by_album_lambda)
         self.media_bucket.grant_read_write(self.delete_song_lambda)
+        self.media_bucket.grant_read_write(self.edit_song_lambda)
         self.media_bucket.grant_put(self.presign_lambda)
 
         genres_table.grant_read_write_data(self.create_song_lambda)
         genres_table.grant_read_data(self.get_songs_lambda)
         genre_catalog_table.grant_read_write_data(self.create_song_lambda)
         genre_catalog_table.grant_read_write_data(self.delete_song_lambda)
+        genre_catalog_table.grant_read_write_data(self.edit_song_lambda)
         self.artist_catalog_table.grant_read_write_data(self.create_song_lambda)
         self.artist_catalog_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.artist_catalog_table.grant_read_write_data(self.delete_song_lambda)
+        self.artist_catalog_table.grant_read_write_data(self.edit_song_lambda)
