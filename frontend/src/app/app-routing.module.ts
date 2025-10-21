@@ -9,6 +9,7 @@ import { DiscoverComponent } from './discover/discover.component';
 import { AlbumsCreationComponent } from './albums-creation/albums-creation.component';
 import { ManageContentComponent } from './admin/manage-content/manage-content.component';
 import { AuthGuard } from './auth/auth.guard';
+import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
 
 const routes: Routes = [
   { path: '', component: DiscoverComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'admin/manage-content', component: ManageContentComponent },
   { path: 'register', component: RegistrationComponent },
   { path: 'artist-create', component: ArtistCreationComponent, canActivate: [AuthGuard], data: { role: 'Admin' } },
+  { path: 'subscriptions', component: SubscriptionsComponent, canActivate: [AuthGuard], data: { role: 'User' } },
   { path: 'login', component: LoginComponent },
   { path: 'album-create', component: AlbumsCreationComponent },
   { path: 'music-upload', component: UploadMusicComponent },

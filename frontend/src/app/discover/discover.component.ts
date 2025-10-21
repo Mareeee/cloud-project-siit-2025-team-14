@@ -4,6 +4,9 @@ import { Genre } from '../models/genre.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { DiscoverArtist, DiscoverAlbum, DiscoverSong } from '../models/discover.models';
+import { SubscriptionsService } from '../services/subscriptions.service';
+import { AuthService } from '../auth/auth.service';
+import { CreateSubscription } from '../models/create-subscription.model';
 
 @Component({
   selector: 'app-discover',
@@ -11,7 +14,7 @@ import { DiscoverArtist, DiscoverAlbum, DiscoverSong } from '../models/discover.
   styleUrls: ['./discover.component.css']
 })
 export class DiscoverComponent implements OnInit {
-  availableGenres: string[] = [];
+  availableGenres: Genre[] = [];
   selectedGenre: string | null = null;
 
   artists: DiscoverArtist[] = [];
@@ -23,23 +26,47 @@ export class DiscoverComponent implements OnInit {
 
   isLoading = false;
 
+  subscriptionsMap: Record<string, boolean> = {};
+  subscriptionsLoaded = false;
+
   constructor(
     private genresService: GenresService,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private subscriptionsService: SubscriptionsService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
     this.loadGenres();
+    this.loadUserSubscriptions();
+  }
+
+  async loadUserSubscriptions() {
+    const userId = await this.authService.getUserId();
+    if (!userId) return;
+
+    this.subscriptionsService.getSubscriptions(userId).subscribe({
+      next: (res) => {
+        res.data.forEach((sub: any) => {
+          this.subscriptionsMap[sub.targetName] = true;
+        });
+        this.subscriptionsLoaded = true;
+      },
+      error: (err) => {
+        console.error('Failed to load subscriptions', err);
+        this.subscriptionsLoaded = true;
+      }
+    });
   }
 
   loadGenres() {
     this.isLoading = true;
     this.genresService.getGenres().subscribe({
       next: (res) => {
-        this.availableGenres = res.data.map((g: Genre) => g.name);
+        this.availableGenres = res.data;
         if (this.availableGenres.length > 0) {
-          this.selectedGenre = this.availableGenres[0];
+          this.selectedGenre = this.availableGenres[0].name;
           this.onGenreChange();
         }
         this.isLoading = false;
@@ -123,5 +150,62 @@ export class DiscoverComponent implements OnInit {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
+  }
+
+  isSubscribed(targetName: string): boolean {
+    return !!this.subscriptionsMap[targetName];
+  }
+
+  async toggleSubscription(targetName: string, targetId: string, targetType: string) {
+    const userId = await this.authService.getUserId();
+    const userEmail = (await this.authService.getUserEmail());
+
+    if (!userId || !userEmail) {
+      this.snackBar.open('You must be logged in to subscribe.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (this.isSubscribed(targetName)) {
+      const subscriptionId = await this.getSubscriptionIdByTarget(targetName);
+      if (!subscriptionId) return;
+
+      this.subscriptionsService.deleteSubscription(subscriptionId).subscribe({
+        next: () => {
+          this.snackBar.open('Unsubscribed successfully', 'Close', { duration: 3000 });
+          delete this.subscriptionsMap[targetName];
+        },
+        error: (err) => {
+          console.error('Failed to unsubscribe', err);
+          this.snackBar.open('Failed to unsubscribe', 'Close', { duration: 3000 });
+        }
+      });
+    } else {
+      const payload: CreateSubscription = { userId, targetId, targetType, email: userEmail };
+      this.subscriptionsService.createSubscription(payload).subscribe({
+        next: (res: any) => {
+          this.snackBar.open('Subscribed successfully', 'Close', { duration: 3000 });
+          this.subscriptionsMap[targetName] = true;
+        },
+        error: (err) => {
+          console.error('Failed to subscribe', err);
+          this.snackBar.open('Failed to subscribe', 'Close', { duration: 3000 });
+        }
+      });
+    }
+  }
+
+  async getSubscriptionIdByTarget(targetName: string): Promise<string | null> {
+    const userId = await this.authService.getUserId();
+    if (!userId) return null;
+
+    return new Promise((resolve) => {
+      this.subscriptionsService.getSubscriptions(userId).subscribe({
+        next: (res) => {
+          const sub = res.data.find((s: any) => s.targetName === targetName);
+          resolve(sub ? String(sub.subscriptionId) : null);
+        },
+        error: () => resolve(null)
+      });
+    });
   }
 }

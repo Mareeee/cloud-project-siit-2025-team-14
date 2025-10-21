@@ -103,4 +103,15 @@ export class AuthService {
       return null;
     }
   }
+
+  async getUserEmail(): Promise<string | null> {
+    try {
+      const session = await fetchAuthSession();
+      const payload = session.tokens?.idToken?.payload ?? {};
+      const email = payload['email'];
+      return typeof email === 'string' ? email : null;
+    } catch {
+      return null;
+    }
+  }
 }

@@ -91,7 +91,7 @@ class ApiStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
         )
-        subs_res.add_resource("{targetId}").add_method(
+        subs_res.add_method(
             "DELETE", apigw.LambdaIntegration(subscriptions_stack.delete_subscription_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
