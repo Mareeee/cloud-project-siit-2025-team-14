@@ -30,6 +30,15 @@
             </mat-error>
         </mat-form-field>
 
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Artists (optional)</mat-label>
+            <mat-select multiple formControlName="artistIds">
+                <mat-option *ngFor="let artist of artists" [value]="artist.id">
+                    {{ artist.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
         <div class="form-buttons">
             <button mat-raised-button type="button" class="cancel" (click)="cancel()">Cancel</button>
             <button mat-raised-button class="submit" type="submit">Save</button>

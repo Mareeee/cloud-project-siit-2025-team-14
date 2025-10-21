@@ -11,11 +11,10 @@
                 <mat-option *ngFor="let genre of availableGenres" [value]="genre.name">
                     <div class="genre-option">
                         <span class="genre-name">{{ genre.name }}</span>
-                        <button mat-mini-fab color="accent" 
-                                class="subscribe-btn-option"
-                                (click)="toggleSubscription(genre.name, genre.id, 'genre'); $event.stopPropagation()"
-                                [disabled]="!subscriptionsLoaded">
-                        {{ isSubscribed(genre.name) ? 'Unsubscribe' : 'Subscribe' }}
+                        <button mat-mini-fab color="accent" class="subscribe-btn-option"
+                            (click)="toggleSubscription(genre.name, genre.id, 'genre'); $event.stopPropagation()"
+                            [disabled]="!subscriptionsLoaded">
+                            {{ isSubscribed(genre.name) ? 'Unsubscribe' : 'Subscribe' }}
                         </button>
                     </div>
                 </mat-option>
@@ -29,16 +28,16 @@
     <section class="section">
         <h3>Artists</h3>
         <div *ngIf="artists.length > 0; else noArtists" class="grid">
-            <mat-card *ngFor="let artist of artists" class="music-card">
+            <mat-card *ngFor="let artist of artists" class="music-card" (click)="showArtistSongs(artist.entityId)">
                 <mat-card-header>
                     <mat-card-title>{{ artist.name }}</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
                     <p>{{ artist.name }}</p>
                     <button mat-raised-button color="primary"
-                            (click)="toggleSubscription(artist.name, artist.entityId, 'artist')"
-                            *ngIf="subscriptionsLoaded">
-                    {{ isSubscribed(artist.name) ? 'Unsubscribe' : 'Subscribe' }}
+                        (click)="toggleSubscription(artist.name, artist.entityId, 'artist')"
+                        *ngIf="subscriptionsLoaded">
+                        {{ isSubscribed(artist.name) ? 'Unsubscribe' : 'Subscribe' }}
                     </button>
                 </mat-card-content>
             </mat-card>

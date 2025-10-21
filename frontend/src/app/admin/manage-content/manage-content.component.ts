@@ -152,8 +152,20 @@ export class ManageContentComponent {
 
     ref.afterClosed().subscribe((res: AlbumEditResult | null) => {
       if (!res?.patch) return;
-      const idx = this.albums.findIndex(a => a.id === album.id);
-      if (idx > -1) this.albums[idx] = { ...this.albums[idx], ...res.patch };
+
+      this.albumsService.editAlbum(album.id, res.patch).subscribe({
+        next: () => {
+          const idx = this.albums.findIndex(a => a.id === album.id);
+          if (idx > -1) {
+            this.albums[idx] = { ...this.albums[idx], ...res.patch };
+          }
+          this.snackBar.open(`Album “${res.patch.title || album.title}” updated!`, 'Close', { duration: 2500 });
+        },
+        error: (err) => {
+          console.error('Album edit failed', err);
+          this.snackBar.open('Failed to edit album.', 'Close', { duration: 3000 });
+        }
+      });
     });
   }
 
@@ -175,9 +187,20 @@ export class ManageContentComponent {
 
     ref.afterClosed().subscribe((ok: boolean) => {
       if (!ok) return;
-      this.albums = this.albums.filter(a => a.id !== album.id);
+
+      this.albumsService.deleteAlbum(album.id).subscribe({
+        next: () => {
+          this.albums = this.albums.filter(a => a.id !== album.id);
+          this.snackBar.open(`Album “${album.title}” deleted`, 'Close', { duration: 2500 });
+        },
+        error: (err) => {
+          console.error('Delete album failed', err);
+          this.snackBar.open('Failed to delete album.', 'Close', { duration: 3000 });
+        }
+      });
     });
   }
+
 
   openArtistEdit(artist: Artist) {
     const ref = this.dialog.open(ArtistEditDialogComponent, {
@@ -188,10 +211,23 @@ export class ManageContentComponent {
       data: { artist }
     });
 
-    ref.afterClosed().subscribe((res: ArtistEditResult | null) => {
-      if (!res?.patch) return;
-      const idx = this.artists.findIndex(a => a.id === artist.id);
-      if (idx > -1) this.artists[idx] = { ...this.artists[idx], ...res.patch };
+    ref.afterClosed().subscribe((res: any) => {
+      if (!res) return;
+
+      this.artistsService.editArtist(res.patch).subscribe({
+        next: (data) => {
+          this.snackBar.open(`Artist ${res.patch.name} has been edited!`, 'Close', { duration: 3000 })
+
+          if (!res?.patch) return;
+          const idx = this.artists.findIndex(a => a.id === artist.id);
+          if (idx > -1) this.artists[idx] = { ...this.artists[idx], ...res.patch };
+
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Failed to artist.', 'Close', { duration: 3000 })
+        }
+      });
     });
   }
 
@@ -217,10 +253,11 @@ Note: Deleting an artist does not delete songs.`,
       this.artists = this.artists.filter(a => a.id !== artist.id);
       this.artistsService.deleteArtist(artist.id).subscribe({
         next: (data) => {
-          console.log(data)
+          console.log("artist-deleted-log", data)
           this.snackBar.open('Artist deleted', 'Close', { duration: 2000 });
         },
         error: (err) => {
+          console.log("artist-fail-delete-log")
           console.error(err);
           this.snackBar.open('Delete failed. Please try again.', 'Close', { duration: 3000 });
         }

@@ -13,7 +13,10 @@ import { Genre } from '../models/genre.model';
   styleUrls: ['./albums-creation.component.css']
 })
 export class AlbumsCreationComponent implements OnInit {
-  newAlbum: Album = { id: '', title: '', releaseDate: '', genres: [] };
+  newAlbum: Album = {
+    id: '', title: '', releaseDate: '', genres: [],
+    artistIds: []
+  };
   availableArtists: Artist[] = [];
   availableGenres: string[] = [];
 
@@ -117,7 +120,7 @@ export class AlbumsCreationComponent implements OnInit {
             this.router.navigate(['/discover']);
         }, 1500);
 
-        this.newAlbum = { id: '', title: '', releaseDate: '', genres: [] };
+        this.newAlbum = { id: '', title: '', releaseDate: '', genres: [], artistIds: [] };
         this.selectedArtistIds = [];
         this.touched = { title: false, releaseDate: false, genres: false };
       },
