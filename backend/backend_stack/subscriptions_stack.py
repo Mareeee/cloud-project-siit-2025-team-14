@@ -56,6 +56,12 @@ class SubscriptionsStack(Stack):
         ))
 
         topic.add_subscription(subs.LambdaSubscription(self.notifier_lambda))
+        self.notifier_lambda.add_permission(
+            "AllowSNSInvoke",
+            principal=iam.ServicePrincipal("sns.amazonaws.com"),
+            action="lambda:InvokeFunction",
+            source_arn=topic.topic_arn
+        )
 
         self.create_subscription_lambda = _lambda.Function(
             self, "CreateSubscriptionLambda",

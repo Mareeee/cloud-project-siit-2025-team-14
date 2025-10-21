@@ -57,17 +57,18 @@ def handler(event, context):
                 "name": name
             })
         
-        sns.publish(
-            TopicArn=TOPIC_ARN,
-            Message=json.dumps({
-                "targetId": artist_id,
-                "contentInfo": {
-                    "type": "artist",
-                    "name": name,
-                    "biography": biography
-                }
-            })
-        )
+        for targetId in genre_ids:
+            sns.publish(
+                TopicArn=TOPIC_ARN,
+                Message=json.dumps({
+                    "targetId": targetId,
+                    "contentInfo": {
+                        "type": "artist",
+                        "name": name,
+                        "biography": biography
+                    }
+                })
+            )
 
         return create_response(200, {
             "message": f"Artist '{name}' created successfully!",
