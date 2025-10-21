@@ -9,7 +9,7 @@ dynamodb = boto3.resource("dynamodb")
 bucket = os.environ["MEDIA_BUCKET"]
 songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
-# ratings_table = dynamodb.Table(os.environ["RATINGS_TABLE"])
+ratings_table = dynamodb.Table(os.environ["RATINGS_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
 
@@ -62,11 +62,26 @@ def _delete_all_edges_for_song(song_id: str):
             for it in items:
                 batch.delete_item(Key={'PK': it['PK'], 'SK': it['SK']})
 
-    # resp = ratings_table.query(
-    #     IndexName="BySongIndex",
-    #     KeyConditionExpression=Key("contentId").eq(song_id)
-    # )
-    # items = resp.get('Items', [])
+    resp = ratings_table.query(
+        IndexName="BySongIndex",
+        KeyConditionExpression=Key("contentId").eq(song_id),
+        ProjectionExpression="contentId, userId"
+    )
+    items = resp.get("Items", [])
+
+    while "LastEvaluatedKey" in resp:
+        resp = ratings_table.query(
+            IndexName="BySongIndex",
+            KeyConditionExpression=Key("contentId").eq(song_id),
+            ProjectionExpression="contentId, userId",
+            ExclusiveStartKey=resp["LastEvaluatedKey"]
+        )
+        items.extend(resp.get("Items", []))
+
+    if items:
+        with ratings_table.batch_writer() as batch:
+            for it in items:
+                batch.delete_item(Key={"contentId": it["contentId"], "userId": it["userId"]})
 
 def handler(event, context):
     try:
