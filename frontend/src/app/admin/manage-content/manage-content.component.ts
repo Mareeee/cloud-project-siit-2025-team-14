@@ -160,8 +160,7 @@ export class ManageContentComponent {
   confirmAlbumDelete(album: Album) {
     const data: ConfirmDialogData = {
       title: 'Delete album',
-      message: `Are you sure you want to delete “${album.title}”?
-Note: Deleting an album will also delete its songs.`,
+      message: `Are you sure you want to delete “${album.title}”?`,
       confirmText: 'Delete',
       cancelText: 'Cancel'
     };

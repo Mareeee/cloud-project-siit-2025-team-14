@@ -40,12 +40,10 @@ class AlbumsStack(Stack):
             handler='albums.delete_album.handler',
             environment={
                 "ALBUMS_TABLE": self.albums_table.table_name,
-                "GENRES_TABLE": genres_table.table_name,
-                "ARTISTS_TABLE": artists_table.table_name,
                 "GENRE_CATALOG_TABLE": genre_catalog_table.table_name
             }
         )
-        
+
         topic.grant_publish(self.create_album_lambda)
 
         self.get_albums_lambda = _lambda.Function(
@@ -61,6 +59,7 @@ class AlbumsStack(Stack):
 
         self.albums_table.grant_read_write_data(self.create_album_lambda)
         self.albums_table.grant_read_write_data(self.get_albums_lambda)
+        self.albums_table.grant_read_write_data(self.delete_album_lambda)
 
         genres_table.grant_read_write_data(self.create_album_lambda)
         genres_table.grant_read_data(self.get_albums_lambda)
@@ -68,3 +67,4 @@ class AlbumsStack(Stack):
         artists_table.grant_read_data(self.create_album_lambda)
         
         genre_catalog_table.grant_read_write_data(self.create_album_lambda)
+        genre_catalog_table.grant_read_write_data(self.delete_album_lambda)
