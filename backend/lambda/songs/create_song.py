@@ -107,17 +107,18 @@ def handler(event, context):
                 "genres": [g["name"] for g in genre_data]
             })
 
-        sns.publish(
-            TopicArn=TOPIC_ARN,
-            Message=json.dumps({
-                "targetId": song_id,
-                "contentInfo": {
-                    "type": "song",
-                    "title": title,
-                    "releaseDate": creation_date
-                }
-            })
-        )
+        for targetId in genre_ids.extend(artist_ids):
+            sns.publish(
+                TopicArn=TOPIC_ARN,
+                Message=json.dumps({
+                    "targetId": targetId,
+                    "contentInfo": {
+                        "type": "song",
+                        "title": title,
+                        "releaseDate": creation_date
+                    }
+                })
+            )
 
         return create_response(200, {
             "message": f'Song "{title}" ready for upload.',
