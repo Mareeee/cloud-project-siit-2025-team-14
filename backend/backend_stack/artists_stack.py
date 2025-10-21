@@ -25,6 +25,12 @@ class ArtistsStack(Stack):
             projection_type=dynamodb.ProjectionType.ALL
         )
 
+        self.artists_table.add_global_secondary_index(
+            index_name="ArtistIdIndex",
+            partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.ALL
+        )
+
         self.create_artist_lambda = _lambda.Function(
             self, 'CreateArtistLambda',
             runtime=_lambda.Runtime.PYTHON_3_9,

@@ -19,6 +19,7 @@ import { MatCardModule } from '@angular/material/card';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { ManageContentComponent } from './admin/manage-content/manage-content.component';
 import { SharedModule } from './shared/shared.module';
+import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SharedModule } from './shared/shared.module';
     DiscoverComponent,
     AlbumsCreationComponent,
     ManageContentComponent,
+    SubscriptionsComponent,
   ],
   imports: [
     BrowserModule,
