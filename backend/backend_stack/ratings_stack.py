@@ -35,5 +35,14 @@ class RatingsStack(Stack):
             environment={"RATINGS_TABLE": self.ratings_table.table_name}
         )
 
+        self.delete_rating_lambda = _lambda.Function(
+            self, "DeleteRatingLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda"),
+            handler="ratings.delete_rating.handler",
+            environment={"RATINGS_TABLE": self.ratings_table.table_name}
+        )
+
         self.ratings_table.grant_read_write_data(self.create_rating_lambda)
         self.ratings_table.grant_read_write_data(self.get_ratings_lambda)
+        self.ratings_table.grant_read_write_data(self.delete_rating_lambda)

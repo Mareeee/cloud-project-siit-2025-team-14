@@ -15,6 +15,7 @@ import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-
 import { ContentEditDialogComponent } from '../../shared/edit-dialog/edit-dialog.component';
 import { AlbumEditDialogComponent, AlbumEditResult } from '../../shared/album-edit-dialog/album-edit-dialog.component';
 import { ArtistEditDialogComponent, ArtistEditResult } from '../../shared/artist-edit-dialog/artist-edit-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-manage-content',
@@ -22,16 +23,11 @@ import { ArtistEditDialogComponent, ArtistEditResult } from '../../shared/artist
   styleUrls: ['./manage-content.component.css']
 })
 export class ManageContentComponent {
-  // MUSIC
   songs: Song[] = [];
   artists: Artist[] = [];
   loading = true;
-
-  // ALBUMS
   albums: Album[] = [];
   albumsLoading = true;
-
-  // common
   allGenres: string[] = [];
 
   constructor(
@@ -39,9 +35,9 @@ export class ManageContentComponent {
     private artistsService: ArtistsService,
     private albumsService: AlbumsService,
     private genresService: GenresService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
   ) {
-    // artists + songs
     forkJoin({
       artists: this.artistsService.getArtists(),
       songs: this.songsService.getSongs(),
@@ -61,20 +57,17 @@ export class ManageContentComponent {
       this.loading = false;
     });
 
-    // albums
     this.albumsService.getAlbums().subscribe({
       next: (res) => { this.albums = res.data || []; this.albumsLoading = false; },
       error: () => { this.albums = []; this.albumsLoading = false; }
     });
 
-    // genres (for editors)
     this.genresService.getGenres().subscribe({
       next: (res) => { this.allGenres = (res.data || []).map((g: any) => g.name); },
       error: () => { this.allGenres = []; }
     });
   }
 
-  // ===== MUSIC =====
   openEdit(song: Song) {
     const ref = this.dialog.open(ContentEditDialogComponent, {
       width: '760px',
@@ -97,7 +90,6 @@ export class ManageContentComponent {
         const idx = this.songs.findIndex(s => s.id === song.id);
         if (idx > -1) this.songs[idx] = { ...this.songs[idx], imageUrl: previewUrl };
       }
-      // newAudioFile -> backend kasnije
     });
   }
 
@@ -119,7 +111,17 @@ export class ManageContentComponent {
 
     ref.afterClosed().subscribe((ok: boolean) => {
       if (!ok) return;
-      this.songs = this.songs.filter(s => s.id !== song.id);
+
+      this.songsService.deleteSong(song.id).subscribe({
+        next: () => {
+          this.songs = this.songs.filter(s => s.id !== song.id);
+          this.snackBar.open('Song deleted', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Delete failed. Please try again.', 'Close', { duration: 3000 });
+        }
+      });
     });
   }
 
@@ -129,7 +131,6 @@ export class ManageContentComponent {
       : 'Unknown artist';
   }
 
-  // ===== ALBUMS =====
   openAlbumEdit(album: Album) {
     const ref = this.dialog.open(AlbumEditDialogComponent, {
       width: '640px',
@@ -169,7 +170,6 @@ Note: Deleting an album will also delete its songs.`,
     });
   }
 
-  // ===== ARTISTS =====
   openArtistEdit(artist: Artist) {
     const ref = this.dialog.open(ArtistEditDialogComponent, {
       width: '640px',
