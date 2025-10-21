@@ -14,6 +14,8 @@ songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
+sns = boto3.client('sns')
+TOPIC_ARN = os.environ['TOPIC_ARN']
 
 def get_or_create_genre(genre_name):
     response = genres_table.query(
@@ -104,6 +106,11 @@ def handler(event, context):
                 "s3KeyAudio": s3_audio_key,
                 "genres": [g["name"] for g in genre_data]
             })
+
+        sns.publish(
+            TopicArn=TOPIC_ARN,
+            Message=json.dumps(item)
+        )
 
         return create_response(200, {
             "message": f'Song "{title}" ready for upload.',

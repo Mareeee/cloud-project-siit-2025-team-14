@@ -10,6 +10,8 @@ albums_table = dynamodb.Table(os.environ["ALBUMS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 artists_table = dynamodb.Table(os.environ["ARTISTS_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
+sns = boto3.client('sns')
+TOPIC_ARN = os.environ['TOPIC_ARN']
 
 def get_or_create_genre(genre_name):
     response = genres_table.query(
@@ -64,6 +66,11 @@ def handler(event, context):
                 "title": title,
                 "releaseDate": release_date
             })
+
+        sns.publish(
+            TopicArn=TOPIC_ARN,
+            Message=json.dumps(item)
+        )
 
         return create_response(200, {
             "message": f'Album "{title}" created successfully.',

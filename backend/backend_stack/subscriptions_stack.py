@@ -11,7 +11,7 @@ from aws_cdk import (
 )
 
 class SubscriptionsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, artist_table, genre_table, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, artist_table, genre_table, topic, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.subscriptions_table = dynamodb.Table(
@@ -31,11 +31,6 @@ class SubscriptionsStack(Stack):
         self.subscriptions_table.add_global_secondary_index(
             index_name="subscriptionId-index",
             partition_key=dynamodb.Attribute(name="subscriptionId", type=dynamodb.AttributeType.STRING)
-        )
-
-        self.topic = sns.Topic(
-            self, "ContentNotificationsTopic",
-            topic_name="ContentNotificationsTopic"
         )
 
         self.verified_email = ses.EmailIdentity(
@@ -61,7 +56,7 @@ class SubscriptionsStack(Stack):
             resources=["*"]
         ))
 
-        self.topic.add_subscription(subs.LambdaSubscription(self.notifier_lambda))
+        topic.add_subscription(subs.LambdaSubscription(self.notifier_lambda))
 
         self.create_subscription_lambda = _lambda.Function(
             self, "CreateSubscriptionLambda",
@@ -96,11 +91,6 @@ class SubscriptionsStack(Stack):
                 "TABLE_NAME": self.subscriptions_table.table_name
             },
         )
-
-        self.topic.grant_publish(self.notifier_lambda)
-        self.topic.grant_publish(self.create_subscription_lambda)
-        self.topic.grant_publish(self.get_subscriptions_lambda)
-        self.topic.grant_publish(self.delete_subscription_lambda)
 
         self.subscriptions_table.grant_read_data(self.notifier_lambda)
         self.subscriptions_table.grant_read_write_data(self.create_subscription_lambda)

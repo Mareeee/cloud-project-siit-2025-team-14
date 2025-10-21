@@ -2,7 +2,6 @@ import json
 import os
 import boto3
 from boto3.dynamodb.conditions import Key
-from utils.utils import create_response
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['TABLE_NAME'])
@@ -11,37 +10,37 @@ SOURCE_EMAIL = os.environ['SOURCE_EMAIL']
 
 def handler(event, context):
     try:
-        body = json.loads(event['body'])
-        content_value = body.get('targetId')
-        content_info = body.get('contentInfo')
+        for record in event['Records']:
+            message = json.loads(record['Sns']['Message'])
+            target_id = message.get('targetId')
+            content_info = message.get('contentInfo')
 
-        if not content_value or not content_info:
-            return create_response(400, {"message": "Missing 'targetId' or 'contentInfo'."})
+            if not target_id or not content_info:
+                print("Skipping invalid message:", message)
+                continue
 
-        response = table.query(
-            IndexName="targetId-index",
-            KeyConditionExpression=Key("targetId").eq(content_value)
-        )
+            response = table.query(
+                IndexName="targetId-index",
+                KeyConditionExpression=Key("targetId").eq(target_id)
+            )
 
-        subscribers = response.get("Items", [])
-        notified_count = 0
+            subscribers = response.get("Items", [])
+            for sub in subscribers:
+                send_email(sub["email"], target_id, content_info)
 
-        for sub in subscribers:
-            send_email(sub["email"], content_value, content_info)
-            notified_count += 1
-
-        return create_response(200, {"message": f"Notified {notified_count} users."})
+        return {"statusCode": 200, "body": json.dumps({"message": "Processed SNS event."})}
 
     except Exception as e:
-        return create_response(500, {"message": str(e)})
+        print("Error:", e)
+        return {"statusCode": 500, "body": str(e)}
 
 
-def send_email(to_email, content_value, content_info):
+def send_email(to_email, target_id, content_info):
     ses.send_email(
         Source=SOURCE_EMAIL,
         Destination={"ToAddresses": [to_email]},
         Message={
-            "Subject": {"Data": f"New Content: {content_value}"},
+            "Subject": {"Data": f"New Content: {target_id}"},
             "Body": {
                 "Text": {"Data": f"New content has been uploaded:\n\n{json.dumps(content_info, indent=2)}"}
             },
