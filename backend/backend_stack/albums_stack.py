@@ -7,7 +7,7 @@ from aws_cdk import (
 )
 
 class AlbumsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, genres_table, artists_table, genre_catalog_table, topic, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, genres_table, artists_table, genre_catalog_table, delete_artist_lambda, topic, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.albums_table = dynamodb.Table(
@@ -61,10 +61,11 @@ class AlbumsStack(Stack):
 
         self.albums_table.grant_read_write_data(self.create_album_lambda)
         self.albums_table.grant_read_write_data(self.get_albums_lambda)
+        self.albums_table.grant_read_write_data(delete_artist_lambda)
 
         genres_table.grant_read_write_data(self.create_album_lambda)
         genres_table.grant_read_data(self.get_albums_lambda)
 
-        artists_table.grant_read_data(self.create_album_lambda)
+        artists_table.grant_read_write_data(self.create_album_lambda)
         
         genre_catalog_table.grant_read_write_data(self.create_album_lambda)

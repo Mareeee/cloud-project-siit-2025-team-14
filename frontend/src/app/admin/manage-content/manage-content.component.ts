@@ -216,6 +216,16 @@ Note: Deleting an artist does not delete songs.`,
     ref.afterClosed().subscribe((ok: boolean) => {
       if (!ok) return;
       this.artists = this.artists.filter(a => a.id !== artist.id);
+      this.artistsService.deleteArtist(artist.id).subscribe({
+        next: (data) => {
+          console.log(data)
+          this.snackBar.open('Artist deleted', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Delete failed. Please try again.', 'Close', { duration: 3000 });
+        }
+      });
     });
   }
 }
