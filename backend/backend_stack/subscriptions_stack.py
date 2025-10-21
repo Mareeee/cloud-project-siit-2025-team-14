@@ -4,6 +4,10 @@ from aws_cdk import (
     RemovalPolicy,
     aws_dynamodb as dynamodb,
     aws_lambda as _lambda,
+    aws_sns as sns,
+    aws_iam as iam,
+    aws_sns_subscriptions as subs,
+    aws_ses as ses
 )
 
 class SubscriptionsStack(Stack):
@@ -19,12 +23,54 @@ class SubscriptionsStack(Stack):
             removal_policy=RemovalPolicy.DESTROY
         )
 
+        self.subscriptions_table.add_global_secondary_index(
+            index_name="targetId-index",
+            partition_key=dynamodb.Attribute(name="targetId", type=dynamodb.AttributeType.STRING)
+        )
+
+        self.subscriptions_table.add_global_secondary_index(
+            index_name="subscriptionId-index",
+            partition_key=dynamodb.Attribute(name="subscriptionId", type=dynamodb.AttributeType.STRING)
+        )
+
+        self.topic = sns.Topic(
+            self, "ContentNotificationsTopic",
+            topic_name="ContentNotificationsTopic"
+        )
+
+        self.verified_email = ses.EmailIdentity(
+            self,
+            "VerifiedSourceEmail",
+            identity=ses.Identity.email("eventplannerteam18@gmail.com")
+        )
+
+        self.notifier_lambda = _lambda.Function(
+            self, "NotifierFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="subscriptions.notifier.handler",
+            code=_lambda.Code.from_asset("lambda"),
+            environment={
+                "TABLE_NAME": self.subscriptions_table.table_name,
+                "TOPIC_ARN": self.topic.topic_arn,
+                "SOURCE_EMAIL": self.verified_email.email_identity_name
+            },
+        )
+
+        self.notifier_lambda.add_to_role_policy(iam.PolicyStatement(
+            actions=["ses:SendEmail", "ses:SendRawEmail"],
+            resources=["*"]
+        ))
+
+        self.topic.add_subscription(subs.LambdaSubscription(self.notifier_lambda))
+
         self.create_subscription_lambda = _lambda.Function(
             self, "CreateSubscriptionLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda"),
             handler="subscriptions.create_subscription.handler",
-            environment={"SUBSCRIPTIONS_TABLE": self.subscriptions_table.table_name}
+            environment={
+                "TABLE_NAME": self.subscriptions_table.table_name
+            },
         )
 
         self.get_subscriptions_lambda = _lambda.Function(
@@ -32,7 +78,9 @@ class SubscriptionsStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda"),
             handler="subscriptions.get_subscriptions.handler",
-            environment={"SUBSCRIPTIONS_TABLE": self.subscriptions_table.table_name}
+            environment={
+                "TABLE_NAME": self.subscriptions_table.table_name
+            },
         )
 
         self.delete_subscription_lambda = _lambda.Function(
@@ -40,9 +88,17 @@ class SubscriptionsStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda"),
             handler="subscriptions.delete_subscription.handler",
-            environment={"SUBSCRIPTIONS_TABLE": self.subscriptions_table.table_name}
+            environment={
+                "TABLE_NAME": self.subscriptions_table.table_name
+            },
         )
 
+        self.topic.grant_publish(self.notifier_lambda)
+        self.topic.grant_publish(self.create_subscription_lambda)
+        self.topic.grant_publish(self.get_subscriptions_lambda)
+        self.topic.grant_publish(self.delete_subscription_lambda)
+
+        self.subscriptions_table.grant_read_data(self.notifier_lambda)
         self.subscriptions_table.grant_read_write_data(self.create_subscription_lambda)
         self.subscriptions_table.grant_read_write_data(self.get_subscriptions_lambda)
         self.subscriptions_table.grant_read_write_data(self.delete_subscription_lambda)
