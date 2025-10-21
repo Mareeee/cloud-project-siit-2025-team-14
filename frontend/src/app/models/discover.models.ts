@@ -28,4 +28,5 @@ export interface DiscoverSong extends GenreEntityBase {
     isPlaying?: boolean;
     currentTime?: number;
     duration?: number;
+    isOffline?: boolean;
 }

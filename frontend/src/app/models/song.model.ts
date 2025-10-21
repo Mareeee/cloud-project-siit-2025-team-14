@@ -18,4 +18,5 @@ export interface Song {
     currentTime?: number;
     averageRating?: number | null;
     userRating?: 'love' | 'like' | 'dislike' | null;
+    isOffline?: boolean;
 }

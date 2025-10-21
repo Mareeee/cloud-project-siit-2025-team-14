@@ -94,6 +94,38 @@ h3 {
   accent-color: #1f27cf;
 }
 
+.download-section {
+  margin-top: 8px;
+}
+
+.download-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background-color: #43a047;
+}
+
+.offline-actions {
+  margin-top: 10px;
+}
+.download-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.download-btn:hover {
+  background: #0056b3;
+}
+
 .no-data-text,
 .no-data-container {
   text-align: center;

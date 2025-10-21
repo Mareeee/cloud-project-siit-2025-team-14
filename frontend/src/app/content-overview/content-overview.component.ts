@@ -81,7 +81,7 @@ export class ContentOverviewComponent implements OnInit {
     });
   }
 
-  private setSongsWithArtists(songs: any[], artists: Artist[]) {
+  private async setSongsWithArtists(songs: any[], artists: Artist[]) {
     this.songs = songs.map((song: any) => {
       const songArtists = artists.filter(a => song.artistIds?.includes(a.id));
       return {
@@ -97,6 +97,14 @@ export class ContentOverviewComponent implements OnInit {
         userRating: null
       };
     });
+
+    for (const song of this.songs) {
+      const blob = await this.songsService.getOfflineSong(song.id);
+      if (blob) {
+        song.audioUrl = URL.createObjectURL(blob);
+        song.isOffline = true;
+      }
+    }
 
     this.songs.forEach(song => {
       this.ratingsService.getRatings(song.id).subscribe(res => {
@@ -145,6 +153,11 @@ export class ContentOverviewComponent implements OnInit {
   }
 
   togglePlay(song: Song, audio: HTMLAudioElement) {
+    if (!navigator.onLine && !song.audioUrl?.startsWith('blob:')) {
+      alert(`No internet — cannot stream "${song.title}".`);
+      return;
+    }
+
     if (this.activeAudio && this.activeAudio !== audio) {
       this.activeAudio.pause();
       const prevSong = this.songs.find(s => s.audioUrl === this.activeAudio?.src);
@@ -156,6 +169,12 @@ export class ContentOverviewComponent implements OnInit {
       song.isPlaying = false;
       this.activeAudio = null;
     } else {
+      if (song.audioUrl?.startsWith('blob:')) {
+        console.log(`Playing from LOCAL STORAGE: ${song.title}`);
+      } else {
+        console.log(`Streaming from AWS: ${song.title}`);
+      }
+
       audio.play();
       song.isPlaying = true;
       this.activeAudio = audio;
@@ -178,5 +197,38 @@ export class ContentOverviewComponent implements OnInit {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
+  }
+
+  downloadSong(song: Song) {
+    this.songsService.getDownloadUrl(song.id, song.title).subscribe({
+      next: (res) => {
+        const link = document.createElement('a');
+        link.href = res.downloadUrl;
+        link.download = `${song.title}.mp3`;
+        link.click();
+      },
+      error: (err) => {
+        console.error('Failed to get download URL:', err);
+        alert('Failed to download song.');
+      },
+    });
+  }
+
+  async downloadOffline(song: Song) {
+    if (song.isOffline) {
+      await this.songsService.deleteOfflineSong(song.id);
+      alert(`Offline copy removed for "${song.title}"`);
+      return;
+    }
+
+    this.songsService.getDownloadUrl(song.id, song.title).subscribe({
+      next: async (res) => {
+        const response = await fetch(res.downloadUrl);
+        const blob = await response.blob();
+        await this.songsService.saveSongOffline(song.id, song.title, blob);
+        alert(`"${song.title}" is now available offline!`);
+      },
+      error: () => alert('Could not download song.')
+    });
   }
 }
