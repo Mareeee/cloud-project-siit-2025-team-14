@@ -19,6 +19,11 @@ class RatingsStack(Stack):
             removal_policy=RemovalPolicy.DESTROY
         )
 
+        self.ratings_table.add_global_secondary_index(
+            index_name="BySongIndex",
+            partition_key=dynamodb.Attribute(name="contentId", type=dynamodb.AttributeType.STRING)
+        )
+
         self.create_rating_lambda = _lambda.Function(
             self, "CreateRatingLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,

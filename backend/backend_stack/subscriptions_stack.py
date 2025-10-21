@@ -46,7 +46,6 @@ class SubscriptionsStack(Stack):
             code=_lambda.Code.from_asset("lambda"),
             environment={
                 "TABLE_NAME": self.subscriptions_table.table_name,
-                "TOPIC_ARN": self.topic.topic_arn,
                 "SOURCE_EMAIL": self.verified_email.email_identity_name
             },
         )
