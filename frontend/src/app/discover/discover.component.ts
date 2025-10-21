@@ -227,7 +227,8 @@ export class DiscoverComponent implements OnInit {
         },
         error: () => resolve(null)
       });
-  }  
+    });
+  }
       
   downloadSong(song: DiscoverSong) {
     this.songsService.getDownloadUrl(song.entityId, song.title).subscribe({
