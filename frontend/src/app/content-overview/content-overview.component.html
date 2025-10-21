@@ -31,6 +31,14 @@
                         {{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}
                     </span>
                 </div>
+                <div class="download-section">
+                    <button (click)="downloadSong(song)" class="download-btn">⬇ Download</button>
+                </div>
+                <div class="offline-actions">
+                    <button (click)="downloadOffline(song)" class="download-btn">
+                        {{ song.isOffline ? 'Remove Offline Copy' : 'Download Offline' }}
+                    </button>
+                </div>
                 <div class="rating-bar">
                     <span class="rating-option" [class.active]="song.userRating === 'love'"
                         (click)="rateSong(song, 'love')">❤️</span>
