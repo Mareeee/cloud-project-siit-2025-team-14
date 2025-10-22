@@ -201,7 +201,6 @@ export class ManageContentComponent {
     });
   }
 
-
   openArtistEdit(artist: Artist) {
     const ref = this.dialog.open(ArtistEditDialogComponent, {
       width: '640px',
@@ -213,9 +212,12 @@ export class ManageContentComponent {
 
     ref.afterClosed().subscribe((res: any) => {
       if (!res) return;
+      console.log(res)
 
       this.artistsService.editArtist(res.patch).subscribe({
         next: (data) => {
+          console.log("log-success:", data)
+
           this.snackBar.open(`Artist ${res.patch.name} has been edited!`, 'Close', { duration: 3000 })
 
           if (!res?.patch) return;

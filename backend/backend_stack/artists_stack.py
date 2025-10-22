@@ -57,6 +57,7 @@ class ArtistsStack(Stack):
             handler='artists.edit_artist.handler',
             environment={
                 "ARTISTS_TABLE": self.artists_table.table_name,
+                "GENRES_TABLE": genres_table.table_name,
                 "GENRE_CATALOG_TABLE": genre_catalog_table.table_name,
                 "ARTIST_CATALOG_TABLE": artist_catalog_table.table_name
             }
@@ -79,6 +80,7 @@ class ArtistsStack(Stack):
         self.artists_table.grant_read_write_data(self.get_artists_lambda)
         self.artists_table.grant_read_write_data(self.delete_artist_lambda)
         self.artists_table.grant_read_write_data(self.edit_artist_lambda)
+        genres_table.grant_read_write_data(self.edit_artist_lambda)
         genres_table.grant_read_write_data(self.create_artist_lambda)
         genres_table.grant_read_data(self.get_artists_lambda)
 

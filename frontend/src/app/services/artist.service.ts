@@ -31,6 +31,6 @@ export class ArtistsService {
     }
 
     editArtist(artist: Artist): Observable<any> {
-        return this.http.put<any>(`${this.url}/${artist.id}`, { artist })
+        return this.http.put<any>(`${this.url}/${artist.id}`, { biography: artist.biography, genreIds: artist.genreIds })
     }
 }

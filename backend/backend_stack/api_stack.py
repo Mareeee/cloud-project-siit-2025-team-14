@@ -77,8 +77,9 @@ class ApiStack(Stack):
             "POST", apigw.LambdaIntegration(artists_stack.create_artist_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer)
-        artists_res.add_resource("{artistId}").add_method("DELETE", apigw.LambdaIntegration(artists_stack.delete_artist_lambda))
-        artists_res.add_resource("{artistId}").add_method("PUT", apigw.LambdaIntegration(artists_stack.edit_artist_lambda))
+        artist_by_id = artists_res.add_resource("{artistId}")
+        artist_by_id.add_method("DELETE", apigw.LambdaIntegration(artists_stack.delete_artist_lambda))
+        artist_by_id.add_method("PUT", apigw.LambdaIntegration(artists_stack.edit_artist_lambda))
 
         albums_res = api.root.add_resource("albums")
         albums_res.add_method("GET", apigw.LambdaIntegration(albums_stack.get_albums_lambda))
