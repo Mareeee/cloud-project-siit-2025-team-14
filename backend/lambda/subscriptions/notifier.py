@@ -40,7 +40,7 @@ def send_email(to_email, target_id, content_info):
 
     if content_type == "artist":
         subject = f"New Artist Created: {content_info['name']}"
-        body = f"Artist Name: {content_info['name']}\nBiography: {content_info.get['biography']}"
+        body = f"Artist Name: {content_info['name']}\nBiography: {content_info['biography']}"
     elif content_type == "album":
         subject = f"New Album Released: {content_info['title']}"
         body = f"Album Title: {content_info['title']}\nRelease Date: {content_info['releaseDate']}"
