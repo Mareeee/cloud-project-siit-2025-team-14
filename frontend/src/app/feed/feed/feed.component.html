@@ -1,7 +1,7 @@
 <div class="feed">
     <div class="feed__header">
-        <h1 class="feed__title">Tvoj feed</h1>
-        <button type="button" class="btn btn--primary" (click)="refresh()">Osveži</button>
+        <h1 class="feed__title">Feed</h1>
+        <button type="button" class="btn btn--primary" (click)="refresh()">Refresh</button>
     </div>
 
     <div *ngIf="loading" class="feed__loading">
@@ -13,14 +13,14 @@
     <div *ngIf="!loading && error" class="feed__error">
         {{ error }}
         <div style="margin-top:10px;">
-            <button type="button" class="btn" (click)="refresh()">Pokušaj ponovo</button>
+            <button type="button" class="btn" (click)="refresh()">Refresh</button>
         </div>
     </div>
 
     <div *ngIf="!loading && !error && items.length === 0" class="feed__empty">
-        Još nemamo preporuke za tebe.
+        No recommendations yet.
         <div style="margin-top:10px;">
-            <a routerLink="/genres" class="btn">Istraži žanrove</a>
+            <a routerLink="/genres" class="btn">Explore genres</a>
         </div>
     </div>
 
@@ -48,8 +48,8 @@
                     <div class="card__subtitle">Album</div>
                     <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
                     <div class="card__actions">
-                        <button type="button" class="btn btn--pill" (click)="openAlbum(item.album.id)">Otvori
-                            album</button>
+                        <button type="button" class="btn btn--pill" (click)="openAlbum(item.album.id)">Open
+                            Album</button>
                     </div>
                 </div>
             </div>
@@ -65,8 +65,8 @@
                     </div>
 
                     <div class="card__actions">
-                        <button type="button" class="btn btn--pill" (click)="openArtist(item.artist.id)">Otvori
-                            izvođača</button>
+                        <button type="button" class="btn btn--pill" (click)="openArtist(item.artist.id)">Open
+                            Artist</button>
                     </div>
                 </div>
             </div>

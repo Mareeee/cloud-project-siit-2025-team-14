@@ -5,6 +5,7 @@ import { FeedItem } from '../../models/feed.model';
 import { fromEvent, interval, merge, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Artist } from '../../models/artist.model';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-feed',
@@ -15,15 +16,18 @@ export class FeedPageComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   items: FeedItem[] = [];
+  currentUserId: string | null = null;
 
   private destroy$ = new Subject<void>();
-  private readonly REFRESH_MS = 90000;
 
-  constructor(private feedService: FeedService) { }
+  constructor(
+    private feedService: FeedService,
+    private authService: AuthService
+  ) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    this.currentUserId = await this.authService.getUserId();
     this.loadFeed();
-    this.startAutoRefresh();
   }
 
   ngOnDestroy(): void {
@@ -35,12 +39,14 @@ export class FeedPageComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    this.feedService.getFeed().subscribe({
+    this.feedService.getFeed(this.currentUserId!).subscribe({
       next: (items) => {
+        console.log("log-feed:", items)
         this.items = items;
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error(err)
         this.loading = false;
         this.error = 'Something went wrong. Try again.';
       }
@@ -49,22 +55,6 @@ export class FeedPageComponent implements OnInit, OnDestroy {
 
   refresh(): void {
     this.loadFeed();
-  }
-
-  private startAutoRefresh(): void {
-    const onFocus$ = fromEvent(document, 'visibilitychange').pipe(
-      filter(() => document.visibilityState === 'visible')
-    );
-
-    const intervalWhileVisible$ = interval(this.REFRESH_MS).pipe(
-      filter(() => document.visibilityState === 'visible')
-    );
-
-    merge(onFocus$, intervalWhileVisible$)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.loadFeed();
-      });
   }
 
   onPlay(songId: string): void {

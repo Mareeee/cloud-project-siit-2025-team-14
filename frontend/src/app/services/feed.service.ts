@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../env/environment';
 import { FeedItem } from '../models/feed.model';
@@ -11,9 +11,11 @@ export class FeedService {
 
     constructor(private http: HttpClient) { }
 
-    getFeed(): Observable<FeedItem[]> {
-        return this.http.get<{ items: FeedItem[] }>(`${this.url}/feed`).pipe(
-            map(res => res?.items ?? [])
-        );
+    getFeed(userId: string): Observable<FeedItem[]> {
+        const params = new HttpParams().set('userId', userId);
+
+        return this.http
+            .get<{ feed: FeedItem[] }>(`${this.url}/feed`, { params })
+            .pipe(map(res => res?.feed ?? []));
     }
 }
