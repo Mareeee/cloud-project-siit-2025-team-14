@@ -51,6 +51,9 @@ class RatingsStack(Stack):
             environment={"RATINGS_TABLE": self.ratings_table.table_name}
         )
 
+        topic.grant_publish(self.delete_rating_lambda)
+        self.delete_rating_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
+
         self.ratings_table.grant_read_write_data(self.create_rating_lambda)
         self.ratings_table.grant_read_write_data(self.get_ratings_lambda)
         self.ratings_table.grant_read_write_data(self.delete_rating_lambda)

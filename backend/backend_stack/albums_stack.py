@@ -18,6 +18,12 @@ class AlbumsStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY
         )
+        
+        self.albums_table.add_global_secondary_index(
+            index_name="AlbumIdIndex",
+            partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.ALL
+        )
 
         artists_table = dynamodb.Table.from_table_name(
             self, "ArtistsTableImport", "ArtistsTable"
