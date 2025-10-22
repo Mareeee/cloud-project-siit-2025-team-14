@@ -67,7 +67,8 @@ def handler(event, context):
                 "releaseDate": release_date
             })
 
-        for targetId in genre_ids.extend(valid_artist_ids):
+        all_target_ids = genre_ids + valid_artist_ids
+        for targetId in all_target_ids:
             sns.publish(
                 TopicArn=TOPIC_ARN,
                 Message=json.dumps({
