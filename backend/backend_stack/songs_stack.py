@@ -8,7 +8,7 @@ from aws_cdk import (
 )
 
 class SongsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, genres_table, genre_catalog_table, ratings_table, topic, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, genres_table, genre_catalog_table, ratings_table, notifications_topic, feed_topic, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.songs_table = dynamodb.Table(
@@ -86,11 +86,13 @@ class SongsStack(Stack):
                 "GENRES_TABLE": genres_table.table_name,
                 "GENRE_CATALOG_TABLE": genre_catalog_table.table_name,
                 "ARTIST_CATALOG_TABLE": self.artist_catalog_table.table_name,
-                "TOPIC_ARN": topic.topic_arn
+                "FEED_TOPIC_ARN": feed_topic.topic_arn,
+                "NOTIFICATIONS_TOPIC_ARN": notifications_topic.topic_arn
             }
         )
 
-        topic.grant_publish(self.create_song_lambda)
+        feed_topic.grant_publish(self.create_song_lambda)
+        notifications_topic.grant_publish(self.create_song_lambda)
 
         self.edit_song_lambda = _lambda.Function(
             self, 'EditSongLambda',

@@ -14,8 +14,10 @@ songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
+
 sns = boto3.client('sns')
-TOPIC_ARN = os.environ['TOPIC_ARN']
+FEED_TOPIC_ARN = os.environ['FEED_TOPIC_ARN']
+NOTIFICATIONS_TOPIC_ARN = os.environ['NOTIFICATIONS_TOPIC_ARN']
 
 def get_or_create_genre(genre_name):
     response = genres_table.query(
@@ -107,10 +109,25 @@ def handler(event, context):
                 "genres": [g["name"] for g in genre_data]
             })
 
+        event_message = {
+            "eventType": "song_uploaded",
+            "songId": song_id,
+            "title": title,
+            "artistIds": artist_ids,
+            "genres": genres,
+            "albumId": album_id,
+            "timestamp": creation_date
+        }
+
+        sns.publish(
+            TopicArn=FEED_TOPIC_ARN,
+            Message=json.dumps(event_message)
+        )
+
         all_target_ids = genre_ids + artist_ids
         for targetId in all_target_ids:
             sns.publish(
-                TopicArn=TOPIC_ARN,
+                TopicArn=NOTIFICATIONS_TOPIC_ARN,
                 Message=json.dumps({
                     "targetId": targetId,
                     "contentInfo": {

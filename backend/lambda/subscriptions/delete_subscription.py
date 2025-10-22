@@ -3,6 +3,9 @@ import os
 import boto3
 from utils.utils import create_response
 
+sns = boto3.client("sns")
+TOPIC_ARN = os.environ.get("TOPIC_ARN")
+
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['TABLE_NAME'])
 
@@ -22,6 +25,16 @@ def handler(event, context):
 
         item = items[0]
         table.delete_item(Key={"userId": item["userId"], "targetId": item["targetId"]})
+
+        sns.publish(
+            TopicArn=TOPIC_ARN,
+            Message=json.dumps({
+                "eventType": "user_unsubscribed",
+                "userId": item["userId"],
+                "targetId": item["targetId"],
+                "targetType": item["targetType"]
+            })
+        )
 
         return create_response(200, {"message": f"Unsubscribed successfully."})
 
