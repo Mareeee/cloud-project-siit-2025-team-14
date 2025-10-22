@@ -35,7 +35,7 @@
                 <mat-card-content>
                     <p>{{ artist.name }}</p>
                     <button mat-raised-button color="primary"
-                        (click)="toggleSubscription(artist.name, artist.entityId, 'artist')"
+                        (click)="toggleSubscription(artist.name, artist.entityId, 'artist'); $event.stopPropagation()"
                         *ngIf="subscriptionsLoaded">
                         {{ isSubscribed(artist.name) ? 'Unsubscribe' : 'Subscribe' }}
                     </button>

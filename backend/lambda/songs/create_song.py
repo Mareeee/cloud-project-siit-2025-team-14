@@ -107,7 +107,8 @@ def handler(event, context):
                 "genres": [g["name"] for g in genre_data]
             })
 
-        for targetId in genre_ids.extend(artist_ids):
+        all_target_ids = genre_ids + artist_ids
+        for targetId in all_target_ids:
             sns.publish(
                 TopicArn=TOPIC_ARN,
                 Message=json.dumps({
