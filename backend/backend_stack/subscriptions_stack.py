@@ -73,6 +73,9 @@ class SubscriptionsStack(Stack):
             },
         )
 
+        topic.grant_publish(self.create_subscription_lambda)
+        self.create_subscription_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
+
         self.get_subscriptions_lambda = _lambda.Function(
             self, "GetSubscriptionsLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -96,6 +99,9 @@ class SubscriptionsStack(Stack):
                 "TABLE_NAME": self.subscriptions_table.table_name
             },
         )
+
+        topic.grant_publish(self.delete_subscription_lambda)
+        self.delete_subscription_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
 
         self.subscriptions_table.grant_read_data(self.notifier_lambda)
         self.subscriptions_table.grant_read_write_data(self.create_subscription_lambda)

@@ -19,6 +19,7 @@ class ApiStack(Stack):
         genres_stack,
         genre_catalog_stack,
         auth_stack,
+        feed_stack,
         **kwargs
     ):
         super().__init__(scope, construct_id, **kwargs)
@@ -114,6 +115,14 @@ class ApiStack(Stack):
         ratings_res.add_method("POST", apigw.LambdaIntegration(ratings_stack.create_rating_lambda))
         ratings_res.add_method("GET", apigw.LambdaIntegration(ratings_stack.get_ratings_lambda))
         ratings_res.add_method("DELETE", apigw.LambdaIntegration(ratings_stack.delete_rating_lambda))
+
+        feed_res = api.root.add_resource("feed")
+        feed_res.add_method(
+            "GET",
+            apigw.LambdaIntegration(feed_stack.get_feed_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         transcribe_res = api.root.add_resource("transcribe")
         transcribe_res.add_method(

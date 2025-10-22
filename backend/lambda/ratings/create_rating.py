@@ -3,6 +3,9 @@ import json
 import boto3
 from utils.utils import create_response
 
+sns = boto3.client("sns")
+TOPIC_ARN = os.environ.get("TOPIC_ARN")
+
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["RATINGS_TABLE"])
 
@@ -23,6 +26,16 @@ def handler(event, context):
             "userId": user_id,
             "rating": rating
         })
+
+        sns.publish(
+            TopicArn=TOPIC_ARN,
+            Message=json.dumps({
+                "eventType": "user_rated",
+                "userId": user_id,
+                "contentId": content_id,
+                "rating": rating
+            })
+        )
 
         return create_response(200, {"message": "Rating saved successfully."})
     except Exception as e:

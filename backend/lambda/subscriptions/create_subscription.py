@@ -5,6 +5,9 @@ import boto3
 import datetime
 from utils.utils import create_response
 
+sns = boto3.client("sns")
+TOPIC_ARN = os.environ.get("TOPIC_ARN")
+
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['TABLE_NAME'])
 
@@ -29,6 +32,16 @@ def handler(event, context):
             "subscriptionId": subscription_id,
             "createdAt": datetime.datetime.utcnow().isoformat()
         })
+
+        sns.publish(
+            TopicArn=TOPIC_ARN,
+            Message=json.dumps({
+                "eventType": "user_subscribed",
+                "userId": user_id,
+                "targetId": target_id,
+                "targetType": target_type
+            })
+        )
 
         return create_response(200, {"message": "Subscribed successfully.", "subscriptionId": subscription_id})
     except Exception as e:
