@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
 import { GenresService } from '../../services/genres.service';
 import { Genre } from '../../models/genre.model';
 import { Artist } from '../../models/artist.model';
@@ -20,7 +21,9 @@ export interface ArtistEditResult {
 })
 export class ArtistEditDialogComponent implements OnInit {
   form!: FormGroup;
-  genres: string[] = [];
+
+  genres: Genre[] = [];
+  genreNameById: Record<string, string> = {};
 
   constructor(
     private fb: FormBuilder,
@@ -28,44 +31,58 @@ export class ArtistEditDialogComponent implements OnInit {
     public ref: MatDialogRef<ArtistEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ArtistEditData
   ) {
-    this.form = this.fb.group({
-      name: new FormControl('', [Validators.required, Validators.maxLength(160)]),
-      biography: new FormControl('', [Validators.maxLength(5000)]),
-      genres: new FormControl<string[]>([], [Validators.required]),
-    });
-
     const a = data.artist;
-    this.form.patchValue({
-      name: a.name ?? '',
-      biography: a.biography ?? '',
-      genres: (a.genres ?? []) as string[],
+
+    this.form = this.fb.group({
+      name: new FormControl<string>({ value: a.name ?? '', disabled: true }, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.maxLength(160)],
+      }),
+      biography: new FormControl<string>(a.biography ?? '', {
+        nonNullable: true,
+        validators: [Validators.maxLength(5000)],
+      }),
+      genreIds: new FormControl<string[]>(Array.isArray((a as any).genreIds) ? (a as any).genreIds : [], {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
     });
   }
 
   ngOnInit(): void {
     this.genresService.getGenres().subscribe({
-      next: (res) => (this.genres = (res.data || []).map((g: Genre) => g.name)),
-      error: () => (this.genres = []),
+      next: (res) => {
+        this.genres = res.data || [];
+        this.genreNameById = Object.fromEntries(this.genres.map((g: Genre) => [g.id, g.name]));
+      },
+      error: () => {
+        this.genres = [];
+        this.genreNameById = {};
+      },
     });
   }
 
-  cancel() { this.ref.close(null); }
+  cancel(): void {
+    this.ref.close(null);
+  }
 
-  save() {
+  save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
     const v = this.form.getRawValue() as {
       name: string;
       biography: string;
-      genres: string[];
+      genreIds: string[];
     };
 
     const patch: Partial<Artist> = {
-      name: v.name,
+      id: this.data.artist.id,
+      name: this.data.artist.name,
       biography: v.biography || '',
-      genres: v.genres || [],
+      genreIds: v.genreIds || [],
     };
 
     const result: ArtistEditResult = { patch };
