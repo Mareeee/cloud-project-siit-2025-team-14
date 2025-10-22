@@ -32,7 +32,9 @@ feed_stack = FeedStack(
     songs_table=songs_stack.songs_table,
     ratings_table=ratings_stack.ratings_table,
     subscriptions_table=subscriptions_stack.subscriptions_table,
-    genres_table=genres_stack.genres_table
+    genres_table=genres_stack.genres_table,
+    albums_table=albums_stack.albums_table,
+    artists_table=artists_stack.artists_table
 )
 transcription_stack = TranscriptionStack(app, "TranscriptionStack")
 seeder_stack = SeederStack(app, "SeederStack")

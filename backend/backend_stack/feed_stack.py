@@ -11,7 +11,7 @@ from aws_cdk import (
 )
 
 class FeedStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, topic, songs_table, ratings_table, subscriptions_table, genres_table, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, topic, songs_table, ratings_table, subscriptions_table, genres_table, albums_table, artists_table, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.feed_queue = sqs.Queue(
@@ -58,7 +58,11 @@ class FeedStack(Stack):
             handler="feed.get_feed.handler",
             code=_lambda.Code.from_asset("lambda"),
             environment={
-                "FEED_TABLE": self.feed_table.table_name
+                "FEED_TABLE": self.feed_table.table_name,
+                "SONGS_TABLE": songs_table.table_name,
+                "ALBUMS_TABLE": albums_table.table_name,
+                "ARTISTS_TABLE": artists_table.table_name,
+
             },
             timeout=Duration.seconds(15)
         )
@@ -69,3 +73,6 @@ class FeedStack(Stack):
         ratings_table.grant_read_data(self.feed_generator_lambda)
         subscriptions_table.grant_read_data(self.feed_generator_lambda)
         genres_table.grant_read_data(self.feed_generator_lambda)
+        songs_table.grant_read_data(self.get_feed_lambda)
+        albums_table.grant_read_data(self.get_feed_lambda)
+        artists_table.grant_read_data(self.get_feed_lambda)
