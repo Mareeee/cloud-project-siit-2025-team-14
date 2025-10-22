@@ -4,14 +4,13 @@ from aws_cdk import (
     RemovalPolicy,
     aws_dynamodb as dynamodb,
     aws_lambda as _lambda,
-    aws_sns as sns,
     aws_iam as iam,
     aws_sns_subscriptions as subs,
     aws_ses as ses
 )
 
 class SubscriptionsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, artist_table, genre_table, topic, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, artist_table, genre_table, feed_topic, notifications_topic, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.subscriptions_table = dynamodb.Table(
@@ -55,12 +54,12 @@ class SubscriptionsStack(Stack):
             resources=["*"]
         ))
 
-        topic.add_subscription(subs.LambdaSubscription(self.notifier_lambda))
+        notifications_topic.add_subscription(subs.LambdaSubscription(self.notifier_lambda))
         self.notifier_lambda.add_permission(
             "AllowSNSInvoke",
             principal=iam.ServicePrincipal("sns.amazonaws.com"),
             action="lambda:InvokeFunction",
-            source_arn=topic.topic_arn
+            source_arn=notifications_topic.topic_arn
         )
 
         self.create_subscription_lambda = _lambda.Function(
@@ -73,8 +72,8 @@ class SubscriptionsStack(Stack):
             },
         )
 
-        topic.grant_publish(self.create_subscription_lambda)
-        self.create_subscription_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
+        feed_topic.grant_publish(self.create_subscription_lambda)
+        self.create_subscription_lambda.add_environment("TOPIC_ARN", feed_topic.topic_arn)
 
         self.get_subscriptions_lambda = _lambda.Function(
             self, "GetSubscriptionsLambda",
@@ -100,8 +99,8 @@ class SubscriptionsStack(Stack):
             },
         )
 
-        topic.grant_publish(self.delete_subscription_lambda)
-        self.delete_subscription_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
+        feed_topic.grant_publish(self.delete_subscription_lambda)
+        self.delete_subscription_lambda.add_environment("TOPIC_ARN", feed_topic.topic_arn)
 
         self.subscriptions_table.grant_read_data(self.notifier_lambda)
         self.subscriptions_table.grant_read_write_data(self.create_subscription_lambda)
