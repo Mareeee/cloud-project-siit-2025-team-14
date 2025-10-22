@@ -10,9 +10,11 @@ import { AlbumsCreationComponent } from './albums-creation/albums-creation.compo
 import { ManageContentComponent } from './admin/manage-content/manage-content.component';
 import { AuthGuard } from './auth/auth.guard';
 import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
+import { FeedPageComponent } from './feed/feed/feed.component';
 
 const routes: Routes = [
   { path: '', component: DiscoverComponent },
+  { path: 'feed', component: FeedPageComponent, canActivate: [AuthGuard], data: { role: 'User' } },
   { path: 'content-overview', component: ContentOverviewComponent },
   { path: 'admin/manage-content', component: ManageContentComponent },
   { path: 'register', component: RegistrationComponent },

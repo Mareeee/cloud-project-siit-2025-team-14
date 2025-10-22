@@ -1,0 +1,76 @@
+<div class="feed">
+    <div class="feed__header">
+        <h1 class="feed__title">Tvoj feed</h1>
+        <button type="button" class="btn btn--primary" (click)="refresh()">Osveži</button>
+    </div>
+
+    <div *ngIf="loading" class="feed__loading">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+    </div>
+
+    <div *ngIf="!loading && error" class="feed__error">
+        {{ error }}
+        <div style="margin-top:10px;">
+            <button type="button" class="btn" (click)="refresh()">Pokušaj ponovo</button>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && !error && items.length === 0" class="feed__empty">
+        Još nemamo preporuke za tebe.
+        <div style="margin-top:10px;">
+            <a routerLink="/genres" class="btn">Istraži žanrove</a>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && !error && items.length > 0" class="feed__list">
+        <ng-container *ngFor="let item of items; trackBy: trackByItem">
+
+            <div *ngIf="item.type === 'SONG'" class="card">
+                <img class="card__cover" [src]="item.song.imageUrl || 'assets/placeholder-cover.png'"
+                    [alt]="item.song.title" loading="lazy" />
+                <div class="card__content">
+                    <div class="card__title">{{ item.song.title }}</div>
+                    <div class="card__subtitle">
+                        {{ item.song.artistNames?.join(', ') || item.song.artistName || 'Unknown Artist' }}
+                    </div>
+                    <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
+                    <div class="card__actions">
+                        <button type="button" class="btn btn--pill" (click)="onPlay(item.song.id)">Play</button>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="item.type === 'ALBUM'" class="card card--no-cover">
+                <div class="card__content">
+                    <div class="card__title">{{ item.album.title }}</div>
+                    <div class="card__subtitle">Album</div>
+                    <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
+                    <div class="card__actions">
+                        <button type="button" class="btn btn--pill" (click)="openAlbum(item.album.id)">Otvori
+                            album</button>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="item.type === 'ARTIST'" class="card card--no-cover">
+                <div class="card__content">
+                    <div class="card__title">{{ item.artist.name }}</div>
+                    <div class="card__subtitle">{{ genresLabel(item.artist) }}</div>
+                    <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
+
+                    <div class="card__bio" *ngIf="item.artist.biography">
+                        {{ truncate(item.artist.biography) }}
+                    </div>
+
+                    <div class="card__actions">
+                        <button type="button" class="btn btn--pill" (click)="openArtist(item.artist.id)">Otvori
+                            izvođača</button>
+                    </div>
+                </div>
+            </div>
+
+        </ng-container>
+    </div>
+</div>

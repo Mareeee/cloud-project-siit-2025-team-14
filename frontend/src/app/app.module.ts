@@ -17,6 +17,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 import { ManageContentComponent } from './admin/manage-content/manage-content.component';
 import { SharedModule } from './shared/shared.module';
 import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
+import { FeedModule } from './feed/feed.module';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { SubscriptionsComponent } from './subscriptions/subscriptions.component'
     AppRoutingModule,
     AuthModule,
     SharedModule,
+    FeedModule,
   ],
   providers: [
     provideClientHydration(),
