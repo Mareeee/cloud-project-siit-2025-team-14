@@ -4,7 +4,8 @@ from aws_cdk import (
     RemovalPolicy,
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
-    aws_s3 as s3
+    aws_s3 as s3,
+    aws_sqs as sqs
 )
 
 class SongsStack(Stack):
@@ -89,6 +90,10 @@ class SongsStack(Stack):
                 "TOPIC_ARN": topic.topic_arn
             }
         )
+
+        def attach_transcription_queue(self, queue: sqs.Queue):
+            self.create_song_lambda.add_environment("TRANSCRIPTION_QUEUE_URL", queue.queue_url)
+            queue.grant_send_messages(self.create_song_lambda)
 
         topic.grant_publish(self.create_song_lambda)
 

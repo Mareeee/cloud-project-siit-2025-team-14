@@ -21,11 +21,15 @@ genres_stack = GenresStack(app, "GenresStack")
 genre_catalog_stack = GenreCatalogStack(app, "GenreCatalogStack")
 auth_stack = AuthStack(app, "AuthStack")
 ratings_stack = RatingsStack(app, "RatingsStack")
+
+transcription_stack = TranscriptionStack(app, "TranscriptionStack")
 songs_stack = SongsStack(app, "SongsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table, ratings_table=ratings_stack.ratings_table, topic=notifications_stack.topic)
+songs_stack.attach_transcription_queue(transcription_stack.transcribe_queue)
+transcription_stack.attach_songs_bucket(songs_stack.media_bucket)
+
 artists_stack = ArtistsStack(app, "ArtistsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table, artist_catalog_table=songs_stack.artist_catalog_table, topic=notifications_stack.topic)
 subscriptions_stack = SubscriptionsStack(app, "SubscriptionsStack", artist_table=artists_stack.artists_table, genre_table=genres_stack.genres_table, topic=notifications_stack.topic)
 albums_stack = AlbumsStack(app, "AlbumsStack", genres_table=genres_stack.genres_table, genre_catalog_table=genre_catalog_stack.genre_catalog_table, topic=notifications_stack.topic)
-transcription_stack = TranscriptionStack(app, "TranscriptionStack")
 seeder_stack = SeederStack(app, "SeederStack")
 
 albums_stack.albums_table.grant_read_write_data(artists_stack.delete_artist_lambda)

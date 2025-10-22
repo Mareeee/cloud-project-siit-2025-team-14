@@ -14,8 +14,12 @@ songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 genres_table = dynamodb.Table(os.environ["GENRES_TABLE"])
 genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
+
 sns = boto3.client('sns')
 TOPIC_ARN = os.environ['TOPIC_ARN']
+
+sqs = boto3.client('sqs')
+TRANSCRIPTION_QUEUE_URL = os.environ['TRANSCRIPTION_QUEUE_URL']
 
 def get_or_create_genre(genre_name):
     response = genres_table.query(
@@ -120,6 +124,15 @@ def handler(event, context):
                     }
                 })
             )
+
+        sqs.send_message(
+            QueueUrl=TRANSCRIPTION_QUEUE_URL,
+            MessageBody=json.dumps({
+                "song_id": song_id,
+                "s3_audio_key": s3_audio_key,
+                "bucket": bucket
+            })
+        )
 
         return create_response(200, {
             "message": f'Song "{title}" ready for upload.',
