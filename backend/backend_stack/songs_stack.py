@@ -60,6 +60,19 @@ class SongsStack(Stack):
             visibility_timeout=Duration.seconds(300)
         )
 
+        self.media_bucket = s3.Bucket(
+            self, "MediaBucket",
+            bucket_name="songs-media",
+            versioned=True,
+            removal_policy=RemovalPolicy.DESTROY,
+            auto_delete_objects=True,
+            cors=[s3.CorsRule(
+                allowed_methods=[s3.HttpMethods.PUT, s3.HttpMethods.GET],
+                allowed_origins=["*"],
+                allowed_headers=["*"]
+            )]
+        )
+
         self.transcription_worker = _lambda.DockerImageFunction(
             self, "TranscriptionWorker",
             code=_lambda.DockerImageCode.from_image_asset(
@@ -95,19 +108,6 @@ class SongsStack(Stack):
         )
 
         self.transcriptions_table.grant_write_data(self.transcription_result_handler)
-
-        self.media_bucket = s3.Bucket(
-            self, "MediaBucket",
-            bucket_name="songs-media",
-            versioned=True,
-            removal_policy=RemovalPolicy.DESTROY,
-            auto_delete_objects=True,
-            cors=[s3.CorsRule(
-                allowed_methods=[s3.HttpMethods.PUT, s3.HttpMethods.GET],
-                allowed_origins=["*"],
-                allowed_headers=["*"]
-            )]
-        )
 
         self.media_bucket.grant_read_write(self.transcription_worker)
         self.media_bucket.grant_read(self.transcription_result_handler)
