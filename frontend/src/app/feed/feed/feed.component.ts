@@ -33,7 +33,7 @@ export class FeedPageComponent implements OnInit, OnDestroy {
   currentUserId: string | null = null;
   private destroy$ = new Subject<void>();
 
-  ui: Record<string, UiState> = {};
+  ui: Partial<Record<string, UiState>> = {};
   private activeAudio: HTMLAudioElement | null = null;
   private activeSongId: string | null = null;
 
@@ -65,6 +65,7 @@ export class FeedPageComponent implements OnInit, OnDestroy {
 
     this.feedService.getFeed(this.currentUserId!).subscribe({
       next: (feed: FeedBuckets) => {
+        console.log("feed", feed)
         this.songs = Array.isArray(feed?.songs) ? feed.songs : [];
         this.artists = Array.isArray(feed?.artists) ? feed.artists : [];
         this.albums = Array.isArray(feed?.albums) ? feed.albums : [];
@@ -96,7 +97,7 @@ export class FeedPageComponent implements OnInit, OnDestroy {
     if (this.activeAudio && this.activeAudio !== audio) {
       try { this.activeAudio.pause(); } catch { }
       if (this.activeSongId && this.ui[this.activeSongId]) {
-        this.ui[this.activeSongId].isPlaying = false;
+        this.ui[songId] ??= { isPlaying: false, currentTime: 0, duration: 0 };
       }
     }
 

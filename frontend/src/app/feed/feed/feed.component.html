@@ -37,10 +37,6 @@
 
                 <div class="card__content">
                     <div class="card__title" [title]="item.song.title">{{ item.song.title }}</div>
-                    <div class="card__subtitle"
-                        [title]="item.song.artistNames?.join(', ') || item.song.artistName || 'Unknown Artist'">
-                        {{ item.song.artistNames?.join(', ') || item.song.artistName || 'Unknown Artist' }}
-                    </div>
                     <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
 
                     <div class="player">
