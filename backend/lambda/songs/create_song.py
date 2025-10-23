@@ -19,6 +19,9 @@ sns = boto3.client('sns')
 FEED_TOPIC_ARN = os.environ['FEED_TOPIC_ARN']
 NOTIFICATIONS_TOPIC_ARN = os.environ['NOTIFICATIONS_TOPIC_ARN']
 
+sqs = boto3.client('sqs')
+TRANSCRIPTION_QUEUE_URL = os.environ['TRANSCRIPTION_QUEUE_URL']
+
 def get_or_create_genre(genre_name):
     response = genres_table.query(
         IndexName="GenreNameIndex",
@@ -137,6 +140,15 @@ def handler(event, context):
                     }
                 })
             )
+
+        sqs.send_message(
+            QueueUrl=TRANSCRIPTION_QUEUE_URL,
+            MessageBody=json.dumps({
+                "song_id": song_id,
+                "s3_audio_key": s3_audio_key,
+                "bucket": bucket
+            })
+        )
 
         return create_response(200, {
             "message": f'Song "{title}" ready for upload.',
