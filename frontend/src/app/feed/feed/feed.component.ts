@@ -65,7 +65,6 @@ export class FeedPageComponent implements OnInit, OnDestroy {
 
     this.feedService.getFeed(this.currentUserId!).subscribe({
       next: (feed: FeedBuckets) => {
-        console.log("feed", feed)
         this.songs = Array.isArray(feed?.songs) ? feed.songs : [];
         this.artists = Array.isArray(feed?.artists) ? feed.artists : [];
         this.albums = Array.isArray(feed?.albums) ? feed.albums : [];
