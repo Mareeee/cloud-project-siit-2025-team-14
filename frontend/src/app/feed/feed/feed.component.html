@@ -17,60 +17,115 @@
         </div>
     </div>
 
-    <div *ngIf="!loading && !error && items.length === 0" class="feed__empty">
+    <div *ngIf="!loading && !error && totalCount === 0" class="feed__empty">
         No recommendations yet.
         <div style="margin-top:10px;">
-            <a routerLink="/genres" class="btn">Explore genres</a>
+            <a routerLink="/discover" (click)="discover()" class="btn">Discover New Things</a>
         </div>
     </div>
 
-    <div *ngIf="!loading && !error && items.length > 0" class="feed__list">
-        <ng-container *ngFor="let item of items; trackBy: trackByItem">
+    <section class="feed__section" *ngIf="songs.length">
+        <div class="section__head">
+            <h2 class="section__title">Songs</h2>
+            <div class="section__sub">{{ songs.length }} items</div>
+        </div>
 
-            <div *ngIf="item.type === 'SONG'" class="card">
+        <div class="cards cards--songs">
+            <div *ngFor="let item of songs; trackBy: trackByItem" class="card">
                 <img class="card__cover" [src]="item.song.imageUrl || 'assets/placeholder-cover.png'"
                     [alt]="item.song.title" loading="lazy" />
+
                 <div class="card__content">
-                    <div class="card__title">{{ item.song.title }}</div>
-                    <div class="card__subtitle">
+                    <div class="card__title" [title]="item.song.title">{{ item.song.title }}</div>
+                    <div class="card__subtitle"
+                        [title]="item.song.artistNames?.join(', ') || item.song.artistName || 'Unknown Artist'">
                         {{ item.song.artistNames?.join(', ') || item.song.artistName || 'Unknown Artist' }}
                     </div>
                     <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
+
+                    <div class="player">
+                        <audio #audioElem [src]="item.song.audioUrl || ''"
+                            (loadedmetadata)="onLoadedMetadata(item.song.id, $event)"
+                            (timeupdate)="onTimeUpdate(item.song.id, $event)" (ended)="onEnded(item.song.id)"></audio>
+
+                        <button type="button" class="btn btn--pill player__btn" [disabled]="!item.song.audioUrl"
+                            (click)="togglePlay(item.song.id, audioElem, item.song.title)"
+                            [title]="ui[item.song.id]?.isPlaying ? 'Pause' : 'Play'">
+                            {{ ui[item.song.id]?.isPlaying ? '❚❚' : '▶' }}
+                        </button>
+
+                        <input class="player__slider" type="range" min="0" [max]="ui[item.song.id]?.duration || 0"
+                            [value]="ui[item.song.id]?.currentTime || 0"
+                            (input)="seek(item.song.id, audioElem, $any($event.target).value)" />
+
+                        <span class="player__time">
+                            {{ formatTime(ui[item.song.id]?.currentTime || 0) }} /
+                            {{ formatTime(ui[item.song.id]?.duration || 0) }}
+                        </span>
+                    </div>
+
                     <div class="card__actions">
-                        <button type="button" class="btn btn--pill" (click)="onPlay(item.song.id)">Play</button>
+                        <button type="button" class="btn btn--pill" (click)="openAlbumFromSong(item.song.albumId)">
+                            Open Album
+                        </button>
+                        <button type="button" class="btn btn--pill" *ngIf="item.song.artistIds?.length"
+                            (click)="openArtist(item.song.artistIds[0])">
+                            Open Artist
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div *ngIf="item.type === 'ALBUM'" class="card card--no-cover">
-                <div class="card__content">
-                    <div class="card__title">{{ item.album.title }}</div>
-                    <div class="card__subtitle">Album</div>
-                    <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
-                    <div class="card__actions">
-                        <button type="button" class="btn btn--pill" (click)="openAlbum(item.album.id)">Open
-                            Album</button>
-                    </div>
-                </div>
-            </div>
+    <section class="feed__section" *ngIf="artists.length">
+        <div class="section__head">
+            <h2 class="section__title">Artists</h2>
+            <div class="section__sub">{{ artists.length }} items</div>
+        </div>
 
-            <div *ngIf="item.type === 'ARTIST'" class="card card--no-cover">
+        <div class="cards cards--artists">
+            <div *ngFor="let item of artists; trackBy: trackByItem" class="card" (click)="openArtist(item.artist.id)"
+                style="cursor:pointer">
                 <div class="card__content">
-                    <div class="card__title">{{ item.artist.name }}</div>
+                    <div class="card__title" [title]="item.artist.name">{{ item.artist.name }}</div>
                     <div class="card__subtitle">{{ genresLabel(item.artist) }}</div>
                     <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
-
                     <div class="card__bio" *ngIf="item.artist.biography">
                         {{ truncate(item.artist.biography) }}
                     </div>
-
                     <div class="card__actions">
-                        <button type="button" class="btn btn--pill" (click)="openArtist(item.artist.id)">Open
-                            Artist</button>
+                        <button type="button" class="btn btn--pill"
+                            (click)="openArtist(item.artist.id); $event.stopPropagation()">
+                            Open Artist
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-        </ng-container>
-    </div>
+    <section class="feed__section" *ngIf="albums.length">
+        <div class="section__head">
+            <h2 class="section__title">Albums</h2>
+            <div class="section__sub">{{ albums.length }} items</div>
+        </div>
+
+        <div class="cards cards--albums">
+            <div *ngFor="let item of albums; trackBy: trackByItem" class="card" (click)="openAlbum(item.album.id)"
+                style="cursor:pointer">
+                <div class="card__content">
+                    <div class="card__title" [title]="item.album.title">{{ item.album.title }}</div>
+                    <div class="card__subtitle">Album</div>
+                    <div class="card__reason" *ngIf="item.reason">{{ item.reason }}</div>
+                    <div class="card__actions">
+                        <button type="button" class="btn btn--pill"
+                            (click)="openAlbum(item.album.id); $event.stopPropagation()">
+                            Open Album
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>

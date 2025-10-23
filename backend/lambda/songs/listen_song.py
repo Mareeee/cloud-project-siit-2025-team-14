@@ -4,10 +4,7 @@ import json
 from boto3.dynamodb.conditions import Key
 from utils.utils import create_response
 
-s3 = boto3.client("s3")
-bucket = os.environ["MEDIA_BUCKET"]
 dynamodb = boto3.resource("dynamodb")
-
 songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 
 sns = boto3.client('sns')
