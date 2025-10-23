@@ -1,0 +1,12 @@
+<div class="lyrics-dialog-container">
+  <h2 class="lyrics-title">{{ data.title }} Lyrics</h2>
+  <div class="lyrics-box">
+    <p *ngIf="!data.lyrics">Lyrics not available yet...</p>
+    <div *ngIf="data.lyrics" class="lyrics-text">
+      <p *ngFor="let line of data.lyrics.split('\n')">{{ line }}</p>
+    </div>
+  </div>
+  <div class="dialog-actions">
+    <button mat-stroked-button color="accent" (click)="close()">Close</button>
+  </div>
+</div>

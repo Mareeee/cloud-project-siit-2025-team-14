@@ -1,0 +1,72 @@
+.lyrics-dialog-container {
+  background: #121212;
+  color: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: fadeIn 0.4s ease;
+}
+
+.lyrics-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #1f27cf;
+}
+
+.lyrics-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.lyrics-text p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.lyrics-text p:nth-child(even) {
+  color: #b3b3b3;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+button[mat-stroked-button] {
+  border-color: #1f27cf;
+  color: #1f27cf;
+  transition: all 0.2s ease;
+}
+
+button[mat-stroked-button]:hover {
+  background-color: #1f27cf;
+  color: #121212;
+}
+
+/* Animacija otvaranja */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.lyrics-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lyrics-box::-webkit-scrollbar-thumb {
+  background: #1f27cf;
+  border-radius: 4px;
+}

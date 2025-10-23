@@ -64,6 +64,13 @@ class ApiStack(Stack):
             "GET", apigw.LambdaIntegration(songs_stack.download_song_lambda)
         )
 
+        lyrics_resource = api.root.add_resource("lyrics")
+        lyrics_id_resource = lyrics_resource.add_resource("{song_id}")
+        lyrics_id_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(songs_stack.get_lyrics_lambda)
+        )
+
         genres_res = api.root.add_resource("genres")
         genres_res.add_method("GET", apigw.LambdaIntegration(genres_stack.get_genres_lambda))
 

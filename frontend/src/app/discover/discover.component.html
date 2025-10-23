@@ -95,6 +95,11 @@
                             {{ song.isOffline ? 'Remove Offline Copy' : 'Download Offline' }}
                         </button>
                     </div>
+                    <div class="lyrics-section">
+                        <button mat-raised-button color="accent" (click)="showLyrics(song)">
+                            Lyrics
+                        </button>
+                    </div>
                 </mat-card-content>
             </mat-card>
         </div>
