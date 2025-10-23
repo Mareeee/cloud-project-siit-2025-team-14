@@ -60,12 +60,16 @@ class SongsStack(Stack):
             visibility_timeout=Duration.seconds(300)
         )
 
-        self.transcription_worker = _lambda.Function(
+        self.transcription_worker = _lambda.DockerImageFunction(
             self, "TranscriptionWorker",
-            runtime=_lambda.Runtime.PYTHON_3_9,
-            handler="transcriptions.transcription_worker.handler",
-            code=_lambda.Code.from_asset("lambda"),
-            timeout=Duration.minutes(5)
+            code=_lambda.DockerImageCode.from_image_asset(
+                "lambda/transcriptions/whisper_worker"
+            ),
+            timeout=Duration.minutes(10),
+            memory_size=2048,
+            environment={
+                "TRANSCRIPTIONS_BUCKET": self.media_bucket.bucket_name
+            }
         )
 
         self.transcribe_queue.grant_consume_messages(self.transcription_worker)
