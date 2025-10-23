@@ -15,7 +15,6 @@ class ApiStack(Stack):
         albums_stack,
         ratings_stack,
         subscriptions_stack,
-        transcription_stack,
         genres_stack,
         genre_catalog_stack,
         auth_stack,
@@ -124,9 +123,4 @@ class ApiStack(Stack):
             apigw.LambdaIntegration(feed_stack.get_feed_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
-        )
-
-        transcribe_res = api.root.add_resource("transcribe")
-        transcribe_res.add_method(
-            "POST", apigw.LambdaIntegration(transcription_stack.transcription_worker)
         )
