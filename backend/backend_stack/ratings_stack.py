@@ -7,7 +7,7 @@ from aws_cdk import (
 )
 
 class RatingsStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, **kwargs):
+    def __init__(self, scope: Construct, construct_id: str, topic, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
         self.ratings_table = dynamodb.Table(
@@ -32,6 +32,9 @@ class RatingsStack(Stack):
             environment={"RATINGS_TABLE": self.ratings_table.table_name}
         )
 
+        topic.grant_publish(self.create_rating_lambda)
+        self.create_rating_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
+
         self.get_ratings_lambda = _lambda.Function(
             self, "GetRatingsLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -47,6 +50,9 @@ class RatingsStack(Stack):
             handler="ratings.delete_rating.handler",
             environment={"RATINGS_TABLE": self.ratings_table.table_name}
         )
+
+        topic.grant_publish(self.delete_rating_lambda)
+        self.delete_rating_lambda.add_environment("TOPIC_ARN", topic.topic_arn)
 
         self.ratings_table.grant_read_write_data(self.create_rating_lambda)
         self.ratings_table.grant_read_write_data(self.get_ratings_lambda)

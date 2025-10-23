@@ -16,7 +16,8 @@ genre_catalog_table = dynamodb.Table(os.environ["GENRE_CATALOG_TABLE"])
 artist_catalog_table = dynamodb.Table(os.environ["ARTIST_CATALOG_TABLE"])
 
 sns = boto3.client('sns')
-TOPIC_ARN = os.environ['TOPIC_ARN']
+FEED_TOPIC_ARN = os.environ['FEED_TOPIC_ARN']
+NOTIFICATIONS_TOPIC_ARN = os.environ['NOTIFICATIONS_TOPIC_ARN']
 
 sqs = boto3.client('sqs')
 TRANSCRIPTION_QUEUE_URL = os.environ['TRANSCRIPTION_QUEUE_URL']
@@ -111,10 +112,25 @@ def handler(event, context):
                 "genres": [g["name"] for g in genre_data]
             })
 
+        event_message = {
+            "eventType": "song_uploaded",
+            "songId": song_id,
+            "title": title,
+            "artistIds": artist_ids,
+            "genres": genres,
+            "albumId": album_id,
+            "timestamp": creation_date
+        }
+
+        sns.publish(
+            TopicArn=FEED_TOPIC_ARN,
+            Message=json.dumps(event_message)
+        )
+
         all_target_ids = genre_ids + artist_ids
         for targetId in all_target_ids:
             sns.publish(
-                TopicArn=TOPIC_ARN,
+                TopicArn=NOTIFICATIONS_TOPIC_ARN,
                 Message=json.dumps({
                     "targetId": targetId,
                     "contentInfo": {
