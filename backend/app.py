@@ -39,7 +39,8 @@ feed_stack = FeedStack(
     subscriptions_table=subscriptions_stack.subscriptions_table,
     genres_table=genres_stack.genres_table,
     albums_table=albums_stack.albums_table,
-    artists_table=artists_stack.artists_table
+    artists_table=artists_stack.artists_table,
+    genre_catalog_table=genre_catalog_stack.genre_catalog_table
 )
 seeder_stack = SeederStack(app, "SeederStack")
 

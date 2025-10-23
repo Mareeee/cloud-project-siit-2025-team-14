@@ -13,9 +13,12 @@ export class FeedService {
 
     getFeed(userId: string): Observable<FeedItem[]> {
         const params = new HttpParams().set('userId', userId);
-
         return this.http
             .get<{ feed: FeedItem[] }>(`${this.url}/feed`, { params })
             .pipe(map(res => res?.feed ?? []));
+    }
+
+    listenSong(userId: string, songId: string): Observable<any> {
+        return this.http.post<any>(`${this.url}/songs/listen/${songId}/${userId}`, {});
     }
 }
