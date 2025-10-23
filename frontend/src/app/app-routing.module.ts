@@ -11,19 +11,20 @@ import { ManageContentComponent } from './admin/manage-content/manage-content.co
 import { AuthGuard } from './auth/auth.guard';
 import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
 import { FeedPageComponent } from './feed/feed/feed.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 const routes: Routes = [
-  { path: '', component: DiscoverComponent },
+  { path: '', component: RedirectComponent },
   { path: 'feed', component: FeedPageComponent, canActivate: [AuthGuard], data: { role: 'User' } },
-  { path: 'content-overview', component: ContentOverviewComponent },
-  { path: 'admin/manage-content', component: ManageContentComponent },
+  { path: 'content-overview', component: ContentOverviewComponent, canActivate: [AuthGuard], data: { role: 'User' } },
+  { path: 'admin/manage-content', component: ManageContentComponent, canActivate: [AuthGuard], data: { role: 'Admin' } },
   { path: 'register', component: RegistrationComponent },
   { path: 'artist-create', component: ArtistCreationComponent, canActivate: [AuthGuard], data: { role: 'Admin' } },
   { path: 'subscriptions', component: SubscriptionsComponent, canActivate: [AuthGuard], data: { role: 'User' } },
   { path: 'login', component: LoginComponent },
-  { path: 'album-create', component: AlbumsCreationComponent },
-  { path: 'music-upload', component: UploadMusicComponent },
-  { path: 'discover', component: DiscoverComponent },
+  { path: 'album-create', component: AlbumsCreationComponent, canActivate: [AuthGuard], data: { role: 'Admin' } },
+  { path: 'music-upload', component: UploadMusicComponent, canActivate: [AuthGuard], data: { role: 'Admin' } },
+  { path: 'discover', component: DiscoverComponent, canActivate: [AuthGuard], data: { role: 'User' } },
   { path: '**', redirectTo: '' },
 ];
 

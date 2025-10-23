@@ -9,7 +9,7 @@
     </div>
 
     <div class="section" *ngIf="isLoggedIn$ | async">
-        <a class="link" (click)="logout()" title="Log out">Log out</a>
+        <a class="link" (click)="logout()" title="Log out" style="cursor: pointer;">Log out</a>
     </div>
 
     <div class="section" *ngIf="(isLoggedIn$ | async) && (userRole$ | async) === 'User'">

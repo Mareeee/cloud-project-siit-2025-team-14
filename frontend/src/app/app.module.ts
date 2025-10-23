@@ -19,6 +19,7 @@ import { SharedModule } from './shared/shared.module';
 import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
 import { FeedModule } from './feed/feed.module';
 import { LyricsComponent } from './lyrics/lyrics.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { LyricsComponent } from './lyrics/lyrics.component';
     ManageContentComponent,
     SubscriptionsComponent,
     LyricsComponent,
+    RedirectComponent,
   ],
   imports: [
     BrowserModule,

@@ -46,83 +46,191 @@ class ApiStack(Stack):
         )
 
         songs_res = api.root.add_resource("songs")
-        songs_res.add_method("GET", apigw.LambdaIntegration(songs_stack.get_songs_lambda))
-        songs_res.add_method("PUT", apigw.LambdaIntegration(songs_stack.create_song_lambda))
-        songs_res.add_resource("{songId}").add_method("DELETE", apigw.LambdaIntegration(songs_stack.delete_song_lambda))
-        songs_res.add_resource("edit").add_resource("{songId}").add_method("PUT", apigw.LambdaIntegration(songs_stack.edit_song_lambda))
+        songs_res.add_method(
+            "GET",
+            apigw.LambdaIntegration(songs_stack.get_songs_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        songs_res.add_method(
+            "PUT",
+            apigw.LambdaIntegration(songs_stack.create_song_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        songs_res.add_resource("{songId}").add_method(
+            "DELETE",
+            apigw.LambdaIntegration(songs_stack.delete_song_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        songs_res.add_resource("edit").add_resource("{songId}").add_method(
+            "PUT",
+            apigw.LambdaIntegration(songs_stack.edit_song_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
         songs_res.add_resource("artist").add_resource("{artistId}").add_method(
-            "GET", apigw.LambdaIntegration(songs_stack.get_songs_by_artist_lambda)
+            "GET",
+            apigw.LambdaIntegration(songs_stack.get_songs_by_artist_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
         songs_res.add_resource("album").add_resource("{albumId}").add_method(
-            "GET", apigw.LambdaIntegration(songs_stack.get_songs_by_album_lambda)
+            "GET",
+            apigw.LambdaIntegration(songs_stack.get_songs_by_album_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
-        songs_res.add_resource("listen").add_resource("{songId}").add_resource("{userId}").add_method("PUT", apigw.LambdaIntegration(songs_stack.listen_song_lambda))
+        songs_res.add_resource("listen").add_resource("{songId}").add_resource("{userId}").add_method(
+            "PUT",
+            apigw.LambdaIntegration(songs_stack.listen_song_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         songs_download_res = songs_res.add_resource("download")
         songs_download_by_id_title = songs_download_res.add_resource("{songId}").add_resource("{title}")
         songs_download_by_id_title.add_method(
-            "GET", apigw.LambdaIntegration(songs_stack.download_song_lambda)
+            "GET",
+            apigw.LambdaIntegration(songs_stack.download_song_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
 
         lyrics_resource = api.root.add_resource("lyrics")
         lyrics_id_resource = lyrics_resource.add_resource("{song_id}")
         lyrics_id_resource.add_method(
             "GET",
-            apigw.LambdaIntegration(songs_stack.get_lyrics_lambda)
+            apigw.LambdaIntegration(songs_stack.get_lyrics_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
 
         genres_res = api.root.add_resource("genres")
-        genres_res.add_method("GET", apigw.LambdaIntegration(genres_stack.get_genres_lambda))
+        genres_res.add_method(
+            "GET",
+            apigw.LambdaIntegration(genres_stack.get_genres_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         genre_catalog_res = api.root.add_resource("discover")
         genre_catalog_res.add_resource("{genre}").add_method(
             "GET",
-            apigw.LambdaIntegration(genre_catalog_stack.get_entities_by_genre_lambda)
+            apigw.LambdaIntegration(genre_catalog_stack.get_entities_by_genre_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
 
         artists_res = api.root.add_resource("artists")
-        artists_res.add_method("GET", apigw.LambdaIntegration(artists_stack.get_artists_lambda))
         artists_res.add_method(
-            "POST", apigw.LambdaIntegration(artists_stack.create_artist_lambda),
+            "GET",
+            apigw.LambdaIntegration(artists_stack.get_artists_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
-            authorizer=authorizer)
+            authorizer=authorizer
+        )
+        artists_res.add_method(
+            "POST",
+            apigw.LambdaIntegration(artists_stack.create_artist_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
         artist_by_id = artists_res.add_resource("{artistId}")
-        artist_by_id.add_method("DELETE", apigw.LambdaIntegration(artists_stack.delete_artist_lambda))
-        artist_by_id.add_method("PUT", apigw.LambdaIntegration(artists_stack.edit_artist_lambda))
+        artist_by_id.add_method(
+            "DELETE",
+            apigw.LambdaIntegration(artists_stack.delete_artist_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        artist_by_id.add_method(
+            "PUT",
+            apigw.LambdaIntegration(artists_stack.edit_artist_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         albums_res = api.root.add_resource("albums")
-        albums_res.add_method("GET", apigw.LambdaIntegration(albums_stack.get_albums_lambda))
-        albums_res.add_method("POST", apigw.LambdaIntegration(albums_stack.create_album_lambda))
+        albums_res.add_method(
+            "GET",
+            apigw.LambdaIntegration(albums_stack.get_albums_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        albums_res.add_method(
+            "POST",
+            apigw.LambdaIntegration(albums_stack.create_album_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
         album_item_res = albums_res.add_resource("{albumId}")
-        album_item_res.add_method("DELETE", apigw.LambdaIntegration(albums_stack.delete_album_lambda))
-        album_item_res.add_method("PUT", apigw.LambdaIntegration(albums_stack.edit_album_lambda))
+        album_item_res.add_method(
+            "DELETE",
+            apigw.LambdaIntegration(albums_stack.delete_album_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        album_item_res.add_method(
+            "PUT",
+            apigw.LambdaIntegration(albums_stack.edit_album_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         presign_res = api.root.add_resource("presign")
-        presign_res.add_method("GET", apigw.LambdaIntegration(songs_stack.presign_lambda))
+        presign_res.add_method(
+            "GET",
+            apigw.LambdaIntegration(songs_stack.presign_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         subs_res = api.root.add_resource("subscriptions")
         subs_res.add_method(
-            "POST", apigw.LambdaIntegration(subscriptions_stack.create_subscription_lambda),
+            "POST",
+            apigw.LambdaIntegration(subscriptions_stack.create_subscription_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
         )
         subs_res.add_method(
-            "GET", apigw.LambdaIntegration(subscriptions_stack.get_subscriptions_lambda),
+            "GET",
+            apigw.LambdaIntegration(subscriptions_stack.get_subscriptions_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
         )
         subs_res.add_method(
-            "DELETE", apigw.LambdaIntegration(subscriptions_stack.delete_subscription_lambda),
+            "DELETE",
+            apigw.LambdaIntegration(subscriptions_stack.delete_subscription_lambda),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer
         )
         new_content_res = api.root.add_resource("new-content")
-        new_content_res.add_method("POST", apigw.LambdaIntegration(subscriptions_stack.notifier_lambda))
+        new_content_res.add_method(
+            "POST",
+            apigw.LambdaIntegration(subscriptions_stack.notifier_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         ratings_res = api.root.add_resource("ratings")
-        ratings_res.add_method("POST", apigw.LambdaIntegration(ratings_stack.create_rating_lambda))
-        ratings_res.add_method("GET", apigw.LambdaIntegration(ratings_stack.get_ratings_lambda))
-        ratings_res.add_method("DELETE", apigw.LambdaIntegration(ratings_stack.delete_rating_lambda))
+        ratings_res.add_method(
+            "POST",
+            apigw.LambdaIntegration(ratings_stack.create_rating_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        ratings_res.add_method(
+            "GET",
+            apigw.LambdaIntegration(ratings_stack.get_ratings_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
+        ratings_res.add_method(
+            "DELETE",
+            apigw.LambdaIntegration(ratings_stack.delete_rating_lambda),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         feed_res = api.root.add_resource("feed")
         feed_res.add_method(
