@@ -2,10 +2,12 @@ from constructs import Construct
 from aws_cdk import (
     Stack,
     RemovalPolicy,
+    Duration,
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
     aws_s3 as s3,
-    aws_sqs as sqs
+    aws_sqs as sqs,
+    aws_lambda_event_sources as lambda_events,
 )
 
 class SongsStack(Stack):
@@ -51,6 +53,13 @@ class SongsStack(Stack):
             projection_type=dynamodb.ProjectionType.KEYS_ONLY,
         )
 
+        # TRANSKRIPCIJA
+
+        self.transcribe_queue = sqs.Queue(
+            self, "TranscriptionQueue",
+            visibility_timeout=Duration.seconds(300)
+        )
+
         self.media_bucket = s3.Bucket(
             self, "MediaBucket",
             bucket_name="songs-media",
@@ -62,6 +71,52 @@ class SongsStack(Stack):
                 allowed_origins=["*"],
                 allowed_headers=["*"]
             )]
+        )
+
+        self.transcription_worker = _lambda.DockerImageFunction(
+            self, "TranscriptionWorker",
+            code=_lambda.DockerImageCode.from_image_asset(
+                "lambda/transcriptions/whisper_worker"
+            ),
+            timeout=Duration.minutes(10),
+            memory_size=2048,
+            environment={
+                "TRANSCRIPTIONS_BUCKET": self.media_bucket.bucket_name
+            }
+        )
+
+        self.transcribe_queue.grant_consume_messages(self.transcription_worker)
+
+        self.transcriptions_table = dynamodb.Table(
+            self, "TranscriptionsTable",
+            partition_key=dynamodb.Attribute(
+                name="song_id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            removal_policy=RemovalPolicy.DESTROY
+        )
+
+        self.transcription_result_handler = _lambda.Function(
+            self, "TranscriptionResultHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="transcriptions.transcription_result.handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.minutes(1),
+            environment={
+                "TRANSCRIPTIONS_TABLE": self.transcriptions_table.table_name,
+            }
+        )
+
+        self.transcriptions_table.grant_write_data(self.transcription_result_handler)
+
+        self.media_bucket.grant_read_write(self.transcription_worker)
+        self.media_bucket.grant_read(self.transcription_result_handler)
+        self.transcription_result_handler.add_event_source(
+            lambda_events.S3EventSource(
+                self.media_bucket,
+                events=[s3.EventType.OBJECT_CREATED],
+                filters=[s3.NotificationKeyFilter(prefix="lyrics/")]
+            )
         )
 
         self.get_songs_lambda = _lambda.Function(
@@ -105,9 +160,8 @@ class SongsStack(Stack):
             }
         )
 
-        def attach_transcription_queue(self, queue: sqs.Queue):
-            self.create_song_lambda.add_environment("TRANSCRIPTION_QUEUE_URL", queue.queue_url)
-            queue.grant_send_messages(self.create_song_lambda)
+        self.create_song_lambda.add_environment("TRANSCRIPTION_QUEUE_URL", self.transcribe_queue.queue_url)
+        self.transcribe_queue.grant_send_messages(self.create_song_lambda)
 
         feed_topic.grant_publish(self.create_song_lambda)
         notifications_topic.grant_publish(self.create_song_lambda)
