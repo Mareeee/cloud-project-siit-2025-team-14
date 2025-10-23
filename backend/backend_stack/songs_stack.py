@@ -271,3 +271,15 @@ class SongsStack(Stack):
         self.artist_catalog_table.grant_read_write_data(self.delete_song_lambda)
         self.artist_catalog_table.grant_read_write_data(self.edit_song_lambda)
         ratings_table.grant_read_write_data(self.delete_song_lambda)
+
+        self.get_lyrics_lambda = _lambda.Function(
+            self, "GetLyricsLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="transcriptions.get_lyrics.handler",
+            code=_lambda.Code.from_asset("lambda"),
+            environment={
+                "TRANSCRIPTIONS_TABLE": self.transcriptions_table.table_name
+            },
+        )
+
+        self.transcriptions_table.grant_read_data(self.get_lyrics_lambda)
