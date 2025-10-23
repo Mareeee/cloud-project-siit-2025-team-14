@@ -75,6 +75,19 @@ class SongsStack(Stack):
             }
         )
 
+        self.listen_song_lambda = _lambda.Function(
+            self, 'ListenSongLambda',
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='songs.listen_song.handler',
+            environment={
+                "SONGS_TABLE": self.songs_table.table_name,
+                "FEED_TOPIC_ARN": feed_topic.topic_arn,
+            }
+        )
+
+        feed_topic.grant_publish(self.listen_song_lambda)
+
         self.create_song_lambda = _lambda.Function(
             self, 'CreateSongLambda',
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -168,6 +181,7 @@ class SongsStack(Stack):
         )
 
         self.songs_table.grant_read_write_data(self.create_song_lambda)
+        self.songs_table.grant_read_write_data(self.listen_song_lambda)
         self.songs_table.grant_read_write_data(self.get_songs_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_artist_lambda)
         self.songs_table.grant_read_data(self.get_songs_by_album_lambda)

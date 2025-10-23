@@ -8,6 +8,7 @@ import { SubscriptionsService } from '../services/subscriptions.service';
 import { AuthService } from '../auth/auth.service';
 import { CreateSubscription } from '../models/create-subscription.model';
 import { SongsService } from '../services/song.service';
+import { FeedService } from '../services/feed.service';
 
 @Component({
   selector: 'app-discover',
@@ -36,7 +37,8 @@ export class DiscoverComponent implements OnInit {
     private router: Router,
     private subscriptionsService: SubscriptionsService,
     private authService: AuthService,
-    private songsService: SongsService
+    private songsService: SongsService,
+    private feedService: FeedService
   ) { }
 
   ngOnInit() {
@@ -126,7 +128,7 @@ export class DiscoverComponent implements OnInit {
     this.router.navigate(['/content-overview'], { queryParams: { albumId } });
   }
 
-  togglePlay(song: DiscoverSong, audio: HTMLAudioElement) {
+  async togglePlay(song: DiscoverSong, audio: HTMLAudioElement) {
     if (!navigator.onLine && !song.audioUrl?.startsWith('blob:')) {
       this.snackBar.open(`No internet - cannot stream "${song.title}"`, 'Close', { duration: 3000 });
       return;
@@ -149,9 +151,19 @@ export class DiscoverComponent implements OnInit {
         console.log(`Streaming from AWS: ${song.title}`);
       }
 
-      audio.play();
+      await audio.play();
       song.isPlaying = true;
       this.activeAudio = audio;
+
+      if (navigator.onLine) {
+        const userId = await this.authService.getUserId();
+        if (userId) {
+          this.feedService.listenSong(userId, song.entityId).subscribe({
+            next: () => { },
+            error: (err) => console.warn('listenSong failed:', err)
+          });
+        }
+      }
     }
   }
 
@@ -229,7 +241,7 @@ export class DiscoverComponent implements OnInit {
       });
     });
   }
-      
+
   downloadSong(song: DiscoverSong) {
     this.songsService.getDownloadUrl(song.entityId, song.title).subscribe({
       next: (res) => {

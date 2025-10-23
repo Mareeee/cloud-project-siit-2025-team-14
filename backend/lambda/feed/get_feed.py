@@ -4,7 +4,9 @@ from boto3.dynamodb.conditions import Key
 from utils.utils import create_response
 from collections import defaultdict
 
+s3 = boto3.client("s3")
 dynamodb = boto3.resource("dynamodb")
+bucket_name = os.environ["MEDIA_BUCKET"]
 feed_table = dynamodb.Table(os.environ["FEED_TABLE"])
 songs_table = dynamodb.Table(os.environ["SONGS_TABLE"])
 albums_table = dynamodb.Table(os.environ["ALBUMS_TABLE"])
@@ -47,6 +49,20 @@ def handler(event, context):
                 song = resp.get("Items", [{}])[0] if resp.get("Items") else None
                 if not song:
                     continue
+
+                if song.get("s3KeyAudio"):
+                    song["audioUrl"] = s3.generate_presigned_url(
+                        "get_object",
+                        Params={"Bucket": bucket_name, "Key": song["s3KeyAudio"]},
+                        ExpiresIn=600
+                    )
+                if song.get("s3KeyCover"):
+                    song["imageUrl"] = s3.generate_presigned_url(
+                        "get_object",
+                        Params={"Bucket": bucket_name, "Key": song["s3KeyCover"]},
+                        ExpiresIn=600
+                    )
+
                 item["song"] = song
 
             elif t == "ALBUM":
