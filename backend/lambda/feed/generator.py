@@ -59,7 +59,7 @@ def process_song_uploaded(msg):
                 "type": "SONG",
                 "contentId": song_id,
                 "title": title,
-                "reason": f"Novo za tvoj {target_type.lower()}: {target_id}",
+                "reason": f"New for your {target_type.lower()}: {target_id}",
                 "timestamp": timestamp,
                 "score": base_score,
             })
@@ -134,9 +134,8 @@ def process_user_rated(msg):
         "contentId": content_id,
         "reason": f"Rated song {r}★",
         "timestamp": datetime.utcnow().isoformat(),
-        "score": r * 2,
+        "score": r * 4,
     })
-
 
 def process_user_subscribed(msg):
     user_id = msg.get("userId")
@@ -145,7 +144,6 @@ def process_user_subscribed(msg):
     target_type = str(raw_type).upper()
     base_score = 3 if target_type == "GENRE" else 4
 
-    # 1) Zabeleži samu pretplatu kao META (ostavio sam tvoj postojeći zapis)
     feed_table.put_item(Item={
         "userId": user_id,
         "createdAt": str(int(time.time() * 1000)),
@@ -156,17 +154,13 @@ def process_user_subscribed(msg):
         "score": base_score,
     })
 
-    # 2) Ako je pretplata na žanr, odmah “nahrani” feed iz Genre kataloga
     if target_type == "GENRE":
-        # target_id ovde očekujemo kao naziv žanra (isti format koji koristiš u katalogu)
-        # npr. "Soul" -> PK = "GENRE#Soul"
         try:
             response = genres_table.query(
                 IndexName="GenreIdIndex",
                 KeyConditionExpression=Key("id").eq(target_id)
             )
             genres = response.get("Items", [])
-            print("genres", genres)
 
             _hydrate_feed_from_genre(user_id, genres[0].get("name"))
         except Exception as e:
@@ -174,13 +168,12 @@ def process_user_subscribed(msg):
 
 def process_user_unsubscribed(msg):
     user_id  = msg.get("userId")
-    genre_id = msg.get("targetId")  # kod vas je za žanr ID, ne ime
+    genre_id = msg.get("targetId")
 
     if not user_id or not genre_id:
         print("process_user_unsubscribed: missing userId/genreId", msg)
         return
 
-    # 1) Obriši META stavke za tu pretplatu (ostavio tvoj postojeći obrazac)
     last_key = None
     while True:
         q = {
@@ -198,7 +191,6 @@ def process_user_unsubscribed(msg):
         if not resp.get("LastEvaluatedKey"):
             break
 
-    # 2) Mapiraj genre_id -> genre_name (isti obrazac kao u subscribe)
     try:
         gresp = genres_table.query(
             IndexName="GenreIdIndex",
@@ -207,7 +199,6 @@ def process_user_unsubscribed(msg):
         gitems = gresp.get("Items", [])
         if not gitems:
             print("process_user_unsubscribed: genre not found for id", genre_id)
-            # čak i ako nema imena, makar obrišemo “Novo za tvoj žanr: {genreId}”
             _delete_by_reason_contains(user_id, str(genre_id))
             return
 
@@ -217,7 +208,6 @@ def process_user_unsubscribed(msg):
         _delete_by_reason_contains(user_id, str(genre_id))
         return
 
-    # 3) Obriši sve HIDRIRANE stavke iz genre kataloga (kontra od _hydrate_feed_from_genre)
     try:
         resp = genre_catalog_table.query(
             KeyConditionExpression=Key("PK").eq(f"GENRE#{genre_name}")
@@ -225,17 +215,15 @@ def process_user_unsubscribed(msg):
         items = resp.get("Items", [])
 
         for it in items:
-            etype = (it.get("entityType") or "").upper()  # SONG/ALBUM/ARTIST
+            etype = (it.get("entityType") or "").upper()
             content_id = (it.get("songId") or it.get("albumId") or
                           it.get("artistId") or it.get("id") or it.get("entityId"))
             if not etype or not content_id:
                 continue
-            # koristiš već postojeći helper da ukloniš sve feed redove za (user, content, type)
             _delete_existing_feed_entries(user_id, content_id, etype)
     except Exception as e:
         print("process_user_unsubscribed: delete hydrated items error:", e)
 
-    # 4) Obriši i sve unose nastale iz “song_uploaded” preko žanra (reason sadrži genre_id)
     _delete_by_reason_contains(user_id, str(genre_id))
 
 def _hydrate_feed_from_genre(user_id, genre_name):
@@ -247,34 +235,26 @@ def _hydrate_feed_from_genre(user_id, genre_name):
     )
     items = resp.get("Items", [])[:MAX_ITEMS]
 
-    print("items", items)
-
     for it in items:
-        print("log-it:", it)
         now_iso = datetime.utcnow().isoformat()
         now_ms  = str(int(time.time() * 1000))
 
-        etype = (it.get("entityType") or "").upper()  # SONG / ALBUM / ARTIST
-        print("etype", etype)        
+        etype = (it.get("entityType") or "").upper()
         if etype not in SCORE_BY_TYPE:
-            print("etype-log-print-onosranje", etype)        
             continue
 
-        # contentId polja (kako imate u katalogu) – pokušaj da pokrije tipične ključeve
         content_id = it.get("songId") or it.get("albumId") or it.get("artistId") or it.get("id") or it.get("entityId")
-        print("log-content_id:", content_id)
         if not content_id:
             continue
 
-        # izbegni duplikate u feedu za istog korisnika/isti sadržaj/tip
         _delete_existing_feed_entries(user_id, content_id, etype)
 
         feed_table.put_item(Item={
             "userId": user_id,
-            "createdAt": now_ms,            # prosto vreme; dovoljno je
-            "type": etype,                  # SONG / ALBUM / ARTIST
+            "createdAt": now_ms,
+            "type": etype,
             "contentId": content_id,
-            "reason": f"Povezano po žanru: {genre_name}",
+            "reason": f"Connected by genre: {genre_name}",
             "timestamp": now_iso,
             "score": SCORE_BY_TYPE[etype],
         })
@@ -329,7 +309,6 @@ def process_listened_song(msg):
         print("process_listened_song: missing userId/songId", msg)
         return
 
-    # Proveri da li pesma već postoji u feedu
     resp = feed_table.query(
         KeyConditionExpression=Key("userId").eq(user_id),
         ScanIndexForward=False,
@@ -342,7 +321,6 @@ def process_listened_song(msg):
     now_ms = str(int(time.time() * 1000))
 
     if not items:
-        # Pesma nije u feedu, dodaj novi unos
         feed_table.put_item(Item={
             "userId": user_id,
             "createdAt": now_ms,
@@ -354,7 +332,6 @@ def process_listened_song(msg):
         })
         print(f"process_listened_song: added new song {song_id} to feed for user {user_id}")
     else:
-        # Pesma već postoji – povećaj score za 1
         item = items[0]
         new_score = item.get("score", 0) + 1
 
