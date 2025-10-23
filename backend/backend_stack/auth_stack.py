@@ -38,7 +38,7 @@ class AuthStack(Stack):
                 require_symbols=False
             ),
             account_recovery=cognito.AccountRecovery.NONE,
-            removal_policy=RemovalPolicy.DESTROY,  # za testiranje
+            removal_policy=RemovalPolicy.DESTROY,
         )
 
         self.user_pool = user_pool
@@ -68,21 +68,33 @@ class AuthStack(Stack):
 
         hosting_bucket = s3.Bucket(
             self, "FrontendHostingBucket",
-            website_index_document="index.html",
-            website_error_document="index.html",
-            public_read_access=False,
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True
         )
 
+        oai = cloudfront.OriginAccessIdentity(self, "OAI")
+
+        hosting_bucket.grant_read(oai)
+
         distribution = cloudfront.Distribution(
             self, "FrontendDistribution",
-            default_root_object="index.html",
             default_behavior=cloudfront.BehaviorOptions(
-                origin=origins.S3StaticWebsiteOrigin(hosting_bucket),
-                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
-            )
+                origin=origins.S3Origin(bucket=hosting_bucket, origin_access_identity=oai),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            ),
+            default_root_object="index.html",
+            error_responses=[
+                cloudfront.ErrorResponse(
+                    http_status=403,
+                    response_http_status=200,
+                    response_page_path="/index.html"
+                ),
+                cloudfront.ErrorResponse(
+                    http_status=404,
+                    response_http_status=200,
+                    response_page_path="/index.html"
+                )
+            ]
         )
 
         CfnOutput(
