@@ -152,4 +152,9 @@ export class SongsService {
     console.log(`Deleted offline song ${id} from IndexedDB.`);
   }
 
+  getLyrics(songId: string) {
+    return this.http.get<{ lyrics: string | null }>(
+      `${environment.apiBaseUrl}/dev/lyrics/${songId}`
+    );
+  }
 }

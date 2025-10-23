@@ -9,6 +9,8 @@ import { AuthService } from '../auth/auth.service';
 import { CreateSubscription } from '../models/create-subscription.model';
 import { SongsService } from '../services/song.service';
 import { FeedService } from '../services/feed.service';
+import { MatDialog } from '@angular/material/dialog';
+import { LyricsComponent } from '../lyrics/lyrics.component';
 
 @Component({
   selector: 'app-discover',
@@ -38,7 +40,8 @@ export class DiscoverComponent implements OnInit {
     private subscriptionsService: SubscriptionsService,
     private authService: AuthService,
     private songsService: SongsService,
-    private feedService: FeedService
+    private feedService: FeedService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -273,6 +276,22 @@ export class DiscoverComponent implements OnInit {
       },
       error: () => {
         this.snackBar.open('Failed to get download URL.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  showLyrics(song: DiscoverSong) {
+    this.songsService.getLyrics(song.entityId).subscribe({
+      next: (res) => {
+        const lyricsText = res.lyrics || 'Lyrics not available yet. Transcription in progress...';
+        this.dialog.open(LyricsComponent, {
+          data: { title: song.title, lyrics: lyricsText },
+          width: '600px'
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load lyrics:', err);
+        this.snackBar.open('Failed to load lyrics.', 'Close', { duration: 3000 });
       }
     });
   }

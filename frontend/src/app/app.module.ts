@@ -18,6 +18,7 @@ import { ManageContentComponent } from './admin/manage-content/manage-content.co
 import { SharedModule } from './shared/shared.module';
 import { SubscriptionsComponent } from './subscriptions/subscriptions.component';
 import { FeedModule } from './feed/feed.module';
+import { LyricsComponent } from './lyrics/lyrics.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { FeedModule } from './feed/feed.module';
     AlbumsCreationComponent,
     ManageContentComponent,
     SubscriptionsComponent,
+    LyricsComponent,
   ],
   imports: [
     BrowserModule,
