@@ -5,12 +5,16 @@ import tempfile
 import whisper
 
 s3 = boto3.client('s3')
-model = whisper.load_model("base")
+
+WHISPER_MODEL_DIR = os.path.join(tempfile.gettempdir(), "whisper_models")
+os.makedirs(WHISPER_MODEL_DIR, exist_ok=True)
+
+model = whisper.load_model("tiny.en", download_root=WHISPER_MODEL_DIR) 
 
 def handler(event, context):
     try:
         for record in event['Records']:
-            body = json.loads(record['body'])
+            body = json.loads(record['body']) 
             song_id = body['song_id']
             s3_audio_key = body['s3_audio_key']
             bucket = body['bucket']
@@ -36,6 +40,7 @@ def handler(event, context):
         }
 
     except Exception as e:
+        print(f"ERROR: {str(e)}")
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)})

@@ -7,7 +7,7 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_s3 as s3,
     aws_sqs as sqs,
-    aws_lambda_event_sources as lambda_events,
+    aws_lambda_event_sources as lambda_events
 )
 
 class SongsStack(Stack):
@@ -53,11 +53,9 @@ class SongsStack(Stack):
             projection_type=dynamodb.ProjectionType.KEYS_ONLY,
         )
 
-        # TRANSKRIPCIJA
-
         self.transcribe_queue = sqs.Queue(
             self, "TranscriptionQueue",
-            visibility_timeout=Duration.seconds(300)
+            visibility_timeout=Duration.seconds(660)
         )
 
         self.media_bucket = s3.Bucket(
@@ -78,7 +76,7 @@ class SongsStack(Stack):
             code=_lambda.DockerImageCode.from_image_asset(
                 "lambda/transcriptions/whisper_worker"
             ),
-            timeout=Duration.minutes(10),
+            timeout=Duration.minutes(5),
             memory_size=2048,
             environment={
                 "TRANSCRIPTIONS_BUCKET": self.media_bucket.bucket_name
@@ -86,6 +84,13 @@ class SongsStack(Stack):
         )
 
         self.transcribe_queue.grant_consume_messages(self.transcription_worker)
+
+        _lambda.EventSourceMapping(
+            self, "TranscriptionQueueMapping",
+            target=self.transcription_worker,
+            event_source_arn=self.transcribe_queue.queue_arn,
+            batch_size=5,
+        )
 
         self.transcriptions_table = dynamodb.Table(
             self, "TranscriptionsTable",
