@@ -1,0 +1,65 @@
+<div *ngIf="songs.length > 0; else noSongs" class="songs-container">
+    <h2>{{ title }}</h2>
+    <div class="songs-grid">
+        <div *ngFor="let song of songs" class="song-card">
+            <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
+
+            <div class="song-info">
+                <h3 class="song-title">{{ song.title }}</h3>
+                <p class="song-artist">{{ song.artistNames?.join(', ') }}</p>
+                <p *ngIf="song.artistBios?.length" class="artist-bio">
+                    Biography: <i>{{ song.artistBios!.join(' | ') }}</i>
+                </p>
+                <p *ngIf="song.genres?.length" class="song-genres">
+                    Genres: {{ song.genres!.join(', ') }}
+                </p>
+                <p class="song-date">Released: {{ song.creationDate | date:'mediumDate' }}</p>
+
+                <div class="audio-player-wrapper">
+                    <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata(song, $event)"
+                        (timeupdate)="onTimeUpdate(song, $event)">
+                    </audio>
+
+                    <button (click)="togglePlay(song, audioElem)" class="play-btn">
+                        {{ song.isPlaying ? '❚❚' : '▶' }}
+                    </button>
+
+                    <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
+                        (input)="seek(song, audioElem)" class="audio-slider" />
+
+                    <span class="time">
+                        {{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}
+                    </span>
+                </div>
+                <div class="download-section">
+                    <button (click)="downloadSong(song)" class="download-btn">⬇ Download</button>
+                </div>
+                <div class="offline-actions">
+                    <button (click)="downloadOffline(song)" class="download-btn">
+                        {{ song.isOffline ? 'Remove Offline Copy' : 'Download Offline' }}
+                    </button>
+                </div>
+                <div class="rating-bar">
+                    <span class="rating-option" [class.active]="song.userRating === 'love'"
+                        (click)="rateSong(song, 'love')">❤️</span>
+
+                    <span class="rating-option" [class.active]="song.userRating === 'like'"
+                        (click)="rateSong(song, 'like')">👍</span>
+
+                    <span class="rating-option" [class.active]="song.userRating === 'dislike'"
+                        (click)="rateSong(song, 'dislike')">👎</span>
+
+                    <span class="avg-rating" *ngIf="song.averageRating">
+                        Avg: {{ song.averageRating.toFixed(1) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #noSongs>
+    <div class="no-data-container">
+        <h3>No songs available for this artist or album.</h3>
+    </div>
+</ng-template>

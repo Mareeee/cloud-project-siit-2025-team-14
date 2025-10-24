@@ -1,0 +1,185 @@
+.songs-container {
+  padding: 2vh;
+  min-height: 90vh;
+  background-color: #121212;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
+
+.songs-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #1f27cf;
+}
+
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.song-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.song-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  cursor: pointer;
+}
+
+.song-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.song-info {
+  padding: 1rem;
+}
+
+.song-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.song-artist {
+  color: #b3b3b3;
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+}
+
+.artist-bio,
+.song-genres,
+.song-date {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin: 0.2rem 0;
+}
+
+.song-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.song-spacer {
+  flex-grow: 1;
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 0.5rem;
+  outline: none;
+}
+
+.audio-player-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.play-btn {
+  background: #1f27cf;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+}
+
+.audio-slider {
+  flex: 1;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: #ccc;
+  width: 70px;
+  text-align: right;
+}
+
+.rating-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rating-option {
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.rating-option:hover {
+  transform: scale(1.2);
+}
+
+.rating-option.active {
+  filter: drop-shadow(0 0 2px #ff4081);
+}
+
+.avg-rating {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.download-section {
+  margin-top: 8px;
+}
+
+.download-btn {
+  background: #1f27cf;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background-color: #43a047;
+}
+
+.offline-actions {
+  margin-top: 10px;
+}
+.download-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.download-btn:hover {
+  background: #0056b3;
+}
+
+.no-data-text,
+.no-data-container {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  margin-top: 20px;
+}

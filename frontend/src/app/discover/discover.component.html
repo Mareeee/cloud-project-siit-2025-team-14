@@ -1,0 +1,110 @@
+<div class="discover-container">
+    <h2 class="page-title">Discover Music</h2>
+
+    <div class="filter-section">
+        <mat-form-field appearance="outline" class="genre-field">
+            <mat-label>Filter by Genre</mat-label>
+            <mat-select [(value)]="selectedGenre" (selectionChange)="onGenreChange()">
+                <mat-select-trigger>
+                    {{ selectedGenre }}
+                </mat-select-trigger>
+                <mat-option *ngFor="let genre of availableGenres" [value]="genre.name">
+                    <div class="genre-option">
+                        <span class="genre-name">{{ genre.name }}</span>
+                        <button mat-mini-fab color="accent" class="subscribe-btn-option"
+                            (click)="toggleSubscription(genre.name, genre.id, 'genre'); $event.stopPropagation()"
+                            [disabled]="!subscriptionsLoaded">
+                            {{ isSubscribed(genre.name) ? 'Unsubscribe' : 'Subscribe' }}
+                        </button>
+                    </div>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" color="accent" diameter="50"
+        style="margin: 20px auto; display:block;"></mat-progress-spinner>
+
+    <section class="section">
+        <h3>Artists</h3>
+        <div *ngIf="artists.length > 0; else noArtists" class="grid">
+            <mat-card *ngFor="let artist of artists" class="music-card" (click)="showArtistSongs(artist.entityId)">
+                <mat-card-header>
+                    <mat-card-title>{{ artist.name }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>{{ artist.name }}</p>
+                    <button mat-raised-button color="primary"
+                        (click)="toggleSubscription(artist.name, artist.entityId, 'artist'); $event.stopPropagation()"
+                        *ngIf="subscriptionsLoaded">
+                        {{ isSubscribed(artist.name) ? 'Unsubscribe' : 'Subscribe' }}
+                    </button>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        <ng-template #noArtists>
+            <p class="no-data-text">No artists available for this genre.</p>
+        </ng-template>
+    </section>
+
+    <section class="section">
+        <h3>Albums</h3>
+        <div *ngIf="albums.length > 0; else noAlbums" class="grid">
+            <mat-card *ngFor="let album of albums" class="music-card" (click)="showAlbumSongs(album.entityId)">
+                <mat-card-header>
+                    <mat-card-title>{{ album.title }}</mat-card-title>
+                    <mat-card-subtitle>Released: {{ album.releaseDate | date:'mediumDate' }}</mat-card-subtitle>
+                </mat-card-header>
+            </mat-card>
+        </div>
+        <ng-template #noAlbums>
+            <p class="no-data-text">No albums available for this genre.</p>
+        </ng-template>
+    </section>
+
+    <section class="section songs-section">
+        <h3>{{ songSectionTitle }}</h3>
+        <div *ngIf="songs.length > 0; else noSongs" class="songs-grid">
+            <mat-card *ngFor="let song of songs" class="song-card">
+                <img *ngIf="song.imageUrl" [src]="song.imageUrl" alt="cover" class="song-image" />
+                <mat-card-content class="song-info">
+                    <h4 class="song-title">{{ song.title }}</h4>
+                    <p class="song-creation-date">{{ song.creationDate }}</p>
+                    <p *ngIf="song.genres?.length" class="song-genres">
+                        Genres: {{ song.genres }}
+                    </p>
+
+                    <div class="audio-player-wrapper">
+                        <audio #audioElem [src]="song.audioUrl" (loadedmetadata)="onLoadedMetadata(song, $event)"
+                            (timeupdate)="onTimeUpdate(song, $event)">
+                        </audio>
+                        <button mat-mini-fab color="accent" (click)="togglePlay(song, audioElem)">
+                            {{ song.isPlaying ? '❚❚' : '▶' }}
+                        </button>
+                        <input type="range" min="0" [max]="song.duration || 0" [(ngModel)]="song.currentTime"
+                            (input)="seek(song, audioElem)" class="audio-slider" />
+                        <span class="time">{{ formatTime(song.currentTime!) }} / {{ formatTime(song.duration!) }}</span>
+                    </div>
+                    <div class="download-section">
+                        <button mat-raised-button color="primary" (click)="downloadSong(song)">
+                            ⬇ Download
+                        </button>
+                    </div>
+                    <div class="offline-actions">
+                        <button mat-raised-button color="primary" (click)="downloadOffline(song)">
+                            {{ song.isOffline ? 'Remove Offline Copy' : 'Download Offline' }}
+                        </button>
+                    </div>
+                    <div class="lyrics-section">
+                        <button mat-raised-button color="accent" (click)="showLyrics(song)">
+                            Lyrics
+                        </button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        <ng-template #noSongs>
+            <p class="no-data-text">No songs available for this genre.</p>
+        </ng-template>
+    </section>
+</div>

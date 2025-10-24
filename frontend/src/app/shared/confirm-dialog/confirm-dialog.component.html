@@ -1,0 +1,17 @@
+<div class="confirm-card" role="dialog" aria-labelledby="cd-title" aria-describedby="cd-msg">
+    <div class="cd-header">
+        <div class="cd-icon warn"><span class="material-icons">warning</span></div>
+        <h3 id="cd-title">{{ data.title || 'Delete item?' }}</h3>
+    </div>
+
+    <p id="cd-msg" class="cd-msg">{{ data.message }}</p>
+
+    <div class="cd-actions">
+        <button type="button" class="btn ghost" (click)="cancel()">
+            {{ data.cancelText || 'Cancel' }}
+        </button>
+        <button type="button" class="btn danger" (click)="confirm()">
+            {{ data.confirmText || 'Delete' }}
+        </button>
+    </div>
+</div>

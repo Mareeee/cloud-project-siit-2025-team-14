@@ -1,0 +1,20 @@
+<div class="subscriptions-container">
+  <h2>Subscriptions</h2>
+
+  <div class="subscriptions-list">
+    <div class="subscription-card" *ngFor="let sub of subscriptions">
+      <div class="info">
+        <h3>{{ sub.targetName }}</h3>
+        <p class="type">{{ sub.targetType }}</p>
+        <p class="date">Subscribed on {{ sub.createdAt | date: 'mediumDate' }}</p>
+      </div>
+      <button class="unsubscribe-btn" (click)="unsubscribe(sub.subscriptionId)">
+        Unsubscribe
+      </button>
+    </div>
+
+    <div class="no-subs" *ngIf="subscriptions.length === 0">
+      <p>You have no active subscriptions</p>
+    </div>
+  </div>
+</div>

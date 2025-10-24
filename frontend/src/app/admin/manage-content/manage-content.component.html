@@ -1,0 +1,111 @@
+<mat-tab-group class="mc-tabs">
+    <mat-tab label="Music">
+        <section class="wrap">
+            <div *ngIf="loading" class="loading">Loading…</div>
+            <div *ngIf="!loading && !songs.length" class="empty">No content yet.</div>
+
+            <div class="grid" *ngIf="!loading && songs.length">
+                <article class="mc-card" *ngFor="let song of songs">
+                    <div class="thumb">
+                        <ng-container *ngIf="song.imageUrl; else thumbFallback">
+                            <img [src]="song.imageUrl" alt="cover" />
+                        </ng-container>
+                        <ng-template #thumbFallback>
+                            <div class="thumb-fallback">
+                                <span class="material-icons">music_note</span>
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <div class="info">
+                        <h3 class="title" [title]="song.title">{{ song.title }}</h3>
+                        <div class="subtitle" [title]="authorLine(song)">{{ authorLine(song) }}</div>
+
+                        <div class="chips" *ngIf="song.genres?.length">
+                            <span class="chip" *ngFor="let g of song.genres">{{ g }}</span>
+                        </div>
+
+                        <div class="date">Created: {{ song.creationDate | date:'mediumDate' }}</div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="icon pill edit" (click)="openEdit(song)" title="Edit">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon pill danger" (click)="confirmDelete(song)" title="Delete">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </mat-tab>
+
+    <mat-tab label="Albums">
+        <section class="wrap">
+            <div *ngIf="albumsLoading" class="loading">Loading…</div>
+            <div *ngIf="!albumsLoading && !albums.length" class="empty">No albums yet.</div>
+
+            <div class="grid" *ngIf="!albumsLoading && albums.length">
+                <article class="mc-card" *ngFor="let album of albums">
+                    <div class="thumb">
+                        <div class="thumb-fallback"><span class="material-icons">album</span></div>
+                    </div>
+
+                    <div class="info">
+                        <h3 class="title" [title]="album.title">{{ album.title }}</h3>
+                        <div class="subtitle">Released: {{ album.releaseDate | date:'mediumDate' }}</div>
+
+                        <div class="chips" *ngIf="album.genres?.length">
+                            <span class="chip" *ngFor="let g of album.genres">{{ g }}</span>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="icon pill edit" (click)="openAlbumEdit(album)" title="Edit">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon pill danger" (click)="confirmAlbumDelete(album)" title="Delete">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </mat-tab>
+
+    <mat-tab label="Artists">
+        <section class="wrap">
+            <div *ngIf="loading" class="loading">Loading…</div>
+            <div *ngIf="!loading && !artists.length" class="empty">No artists yet.</div>
+
+            <div class="grid" *ngIf="!loading && artists.length">
+                <article class="mc-card" *ngFor="let artist of artists">
+                    <div class="thumb">
+                        <div class="thumb-fallback"><span class="material-icons">person</span></div>
+                    </div>
+
+                    <div class="info">
+                        <h3 class="title" [title]="artist.name">{{ artist.name }}</h3>
+                        <div class="subtitle" [title]="artist.biography || '-'">
+                            {{ (artist.biography || '-') | slice:0:90 }}
+                        </div>
+
+                        <div class="chips" *ngIf="artist.genres?.length">
+                            <span class="chip" *ngFor="let g of artist.genres">{{ g }}</span>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="icon pill edit" (click)="openArtistEdit(artist)" title="Edit">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon pill danger" (click)="confirmArtistDelete(artist)" title="Delete">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </mat-tab>
+</mat-tab-group>
